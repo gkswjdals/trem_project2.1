@@ -1,20 +1,11 @@
 package main;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class VendingMachine {
     private List<Product> products;
     private List<Coin> coins;
     private int currentAmount;
-
-    public VendingMachine() {
-        products = new ArrayList<>();
-        coins = new ArrayList<>();
-        currentAmount = 0;
-        initializeProducts();
-        initializeCoins();
-    }
 
     private void initializeProducts() {
         products.add(new Product("물", 450, 10));
