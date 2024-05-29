@@ -19,7 +19,7 @@ public class VendingMachineUI extends JLayeredPane {
         add(background, JLayeredPane.DEFAULT_LAYER);
     }
 
-    public void addDrink(String name, int imgX, int imgY, int imgWidth, int imgHeight, String imagePath, int labelX, int labelY, int labelWidth, int labelHeight) {
+    public void addDrink(String name, int imgX, int imgY, int imgWidth, int imgHeight, String imagePath, int labelX, int labelY, int labelWidth, int labelHeight, int price) {
         try {
             BufferedImage img = ImageIO.read(new File(imagePath));
             Image scaledImg = img.getScaledInstance(imgWidth, imgHeight, Image.SCALE_SMOOTH);
@@ -41,6 +41,15 @@ public class VendingMachineUI extends JLayeredPane {
             button.setHorizontalTextPosition(SwingConstants.CENTER);
             button.setVerticalTextPosition(SwingConstants.CENTER);
             add(button, JLayeredPane.PALETTE_LAYER);
+
+            // 가격 라벨 추가
+            JLabel priceLabel = new JLabel(price + " 원");
+            priceLabel.setBounds(labelX, labelY + 10, labelWidth, labelHeight);
+            priceLabel.setFont(buttonFont);
+            priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            priceLabel.setVerticalAlignment(SwingConstants.CENTER);
+            priceLabel.setForeground(Color.WHITE); // 글자색을 흰색으로 설정
+            add(priceLabel, JLayeredPane.PALETTE_LAYER);
         } catch (IOException e) {
             e.printStackTrace();
         }

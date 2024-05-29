@@ -15,6 +15,7 @@ public class VendingMachineGUI {
     private int currentAmount = 0;
     private JFrame mainFrame;
     private JLabel amountLabel;
+    private JLabel[] greenDots; // Array for green dots
 
     private Drink[] drinks = {
         new Drink("water", "물", 450),
@@ -28,6 +29,7 @@ public class VendingMachineGUI {
     public VendingMachineGUI() {
         vendingMachine = new VendingMachine();
         admin = new Admin("admin123!");
+        greenDots = new JLabel[drinks.length]; // Initialize the array
         createAndShowGUI();
     }
 
@@ -36,22 +38,26 @@ public class VendingMachineGUI {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(800, 600);
 
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(800, 600));
-
-        // 배경 이미지 추가
-        JLabel background = new JLabel(new ImageIcon("src/main.png"));
-        background.setBounds(0, 0, 800, 600);
-        layeredPane.add(background, JLayeredPane.DEFAULT_LAYER);
+        JLayeredPane layeredPane = new VendingMachineUI();
 
         // 음료수 버튼 추가
-        addDrink(layeredPane, drinks[0], 290, 55, 30, 75, "src/water.png", 273, 129, 65, 20, 290, 150, 65, 20);
-        addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 150, 65, 20);
-        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/eon.png", 403, 129, 65, 20, 418, 150, 65, 20);
-        addDrink(layeredPane, drinks[3], 480, 52, 43, 80, "src/high_coffee.png", 471, 129, 65, 20, 480, 150, 65, 20);
-        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/sparkle.png", 274, 236, 65, 20, 287, 260, 65, 20);
-        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/monster.png", 333, 236, 73, 20, 352, 260, 73, 20);
+        addDrink(layeredPane, drinks[0], 290, 55, 30, 75, "src/water.png", 273, 129, 65, 20, 290, 140, 65, 20, 270, 150, 0);
+        addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 140, 65, 20, 335, 150, 1); // 커피 초록색 점 위치 조정
+        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 403, 129, 65, 20, 418, 140, 65, 20, 402, 149, 2); // 이온음료 초록색 점 위치 조정
+        addDrink(layeredPane, drinks[3], 480, 52, 43, 80, "src/high.png", 471, 129, 65, 20, 480, 140, 65, 20, 470, 150, 3);
+        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 274, 236, 65, 20, 287, 250, 65, 20, 270, 258, 4); // 탄산음료 초록색 점 위치 조정
+        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 236, 73, 20, 352, 250, 73, 20, 335, 257, 5); // 특화음료 초록색 점 위치 조정
 
+        // 음료수 버튼의 숫자의 의미
+        // imgX, imgY: 음료 이미지의 X, Y 좌표
+        // imgWidth, imgHeight: 음료 이미지의 너비와 높이
+        // labelX, labelY: 음료 이름 라벨의 X, Y 좌표
+        // labelWidth, labelHeight: 음료 이름 라벨의 너비와 높이
+        // buttonX, buttonY: 음료 버튼의 X, Y 좌표
+        // buttonWidth, buttonHeight: 음료 버튼의 너비와 높이
+        // greenDotX, greenDotY: 초록색 점의 X, Y 좌표
+        // dotIndex: 초록색 점의 인덱스
+        
         // 빨간색 동그라미 버튼 추가
         addRedCircleButton(layeredPane, 474, 308, 30, 30);
 
@@ -65,7 +71,7 @@ public class VendingMachineGUI {
         mainFrame.setVisible(true);
     }
 
-    private void addDrink(JLayeredPane pane, Drink drink, int imgX, int imgY, int imgWidth, int imgHeight, String imagePath, int labelX, int labelY, int labelWidth, int labelHeight, int buttonX, int buttonY, int buttonWidth, int buttonHeight) {
+    private void addDrink(JLayeredPane pane, Drink drink, int imgX, int imgY, int imgWidth, int imgHeight, String imagePath, int labelX, int labelY, int labelWidth, int labelHeight, int buttonX, int buttonY, int buttonWidth, int buttonHeight, int greenDotX, int greenDotY, int dotIndex) {
         try {
             BufferedImage img = ImageIO.read(new File(imagePath));
             Image scaledImg = img.getScaledInstance(imgWidth, imgHeight, Image.SCALE_SMOOTH);
@@ -85,9 +91,29 @@ public class VendingMachineGUI {
             nameLabel.setVerticalAlignment(SwingConstants.CENTER);
             pane.add(nameLabel, JLayeredPane.PALETTE_LAYER);
 
+            // 가격 라벨 추가
+            JLabel priceLabel = new JLabel(drink.getPrice() + "");
+            priceLabel.setBounds(labelX+2, labelY + 16, labelWidth, labelHeight);
+            priceLabel.setFont(new Font("Arial", Font.BOLD, 10));
+            priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            priceLabel.setVerticalAlignment(SwingConstants.CENTER);
+            priceLabel.setForeground(Color.WHITE); // 글자색을 흰색으로 설정
+            pane.add(priceLabel, JLayeredPane.PALETTE_LAYER);
+
             // 검정 부분에 버튼 추가
             JButton button = createDrinkButton(drink, buttonX, buttonY, buttonWidth, buttonHeight);
             pane.add(button, JLayeredPane.PALETTE_LAYER);
+
+            // 초록색 점 라벨 추가
+            BufferedImage greenDotImg = ImageIO.read(new File("src/green.png"));
+            Image scaledGreenDotImg = greenDotImg.getScaledInstance(10, 10, Image.SCALE_SMOOTH);
+            ImageIcon greenDotIcon = new ImageIcon(scaledGreenDotImg);
+
+            JLabel greenDotLabel = new JLabel(greenDotIcon);
+            greenDotLabel.setBounds(greenDotX + 15, greenDotY, 10, 10);
+            greenDotLabel.setVisible(false);
+            pane.add(greenDotLabel, JLayeredPane.PALETTE_LAYER);
+            greenDots[dotIndex] = greenDotLabel;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,9 +141,24 @@ public class VendingMachineGUI {
         if (currentAmount >= drink.getPrice()) {
             currentAmount -= drink.getPrice();
             amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
-            JOptionPane.showMessageDialog(null, drink.getKoreanName() + "를 구입했습니다.");
+            if (drink.getKoreanName().equals("물")) {
+                JOptionPane.showMessageDialog(null, drink.getKoreanName() + "을 구입했습니다.");
+            } else {
+                JOptionPane.showMessageDialog(null, drink.getKoreanName() + "를 구입했습니다.");
+            }
+            updateGreenDots(); // Update green dots after purchase
         } else {
             JOptionPane.showMessageDialog(null, "금액이 부족합니다.");
+        }
+    }
+
+    private void updateGreenDots() { // Method to update green dots
+        for (int i = 0; i < drinks.length; i++) {
+            if (currentAmount >= drinks[i].getPrice()) {
+                greenDots[i].setVisible(true);
+            } else {
+                greenDots[i].setVisible(false);
+            }
         }
     }
 
@@ -169,6 +210,7 @@ public class VendingMachineGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 newFrame.dispose();
+                updateGreenDots(); // Update green dots when money insertion is completed
             }
         });
         newPane.add(completeButton, JLayeredPane.PALETTE_LAYER);

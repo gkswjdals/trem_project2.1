@@ -2,10 +2,12 @@ package main;
 
 import java.util.List;
 
+
 public class VendingMachine {
     private List<Product> products;
     private List<Coin> coins;
     private int currentAmount;
+
 
     private void initializeProducts() {
         products.add(new Product("물", 450, 10));
