@@ -42,13 +42,12 @@ public class VendingMachineUI extends JLayeredPane {
             button.setVerticalTextPosition(SwingConstants.CENTER);
             add(button, JLayeredPane.PALETTE_LAYER);
 
-            // 가격 라벨 추가
             JLabel priceLabel = new JLabel(price + " 원");
             priceLabel.setBounds(labelX, labelY + 10, labelWidth, labelHeight);
             priceLabel.setFont(buttonFont);
             priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
             priceLabel.setVerticalAlignment(SwingConstants.CENTER);
-            priceLabel.setForeground(Color.WHITE); // 글자색을 흰색으로 설정
+            priceLabel.setForeground(Color.WHITE);
             add(priceLabel, JLayeredPane.PALETTE_LAYER);
         } catch (IOException e) {
             e.printStackTrace();
