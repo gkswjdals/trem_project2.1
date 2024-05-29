@@ -1,6 +1,7 @@
 package main;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,9 @@ public class VendingMachineGUI {
     private JFrame mainFrame;
     private JLabel amountLabel;
     private JLabel[] greenDots;
+    private JLabel[] stockLabels;
+    private JLabel[] blueDots;
+    private JButton[] drinkButtons;
 
     private final int MAX_CASH_LIMIT = 5000;
     private final int MAX_TOTAL_LIMIT = 7000;
@@ -28,11 +32,13 @@ public class VendingMachineGUI {
         new Drink("Soda", "탄산음료", 750),
         new Drink("Special", "특화음료", 800)
     };
-
+    
     public VendingMachineGUI() {
-        vendingMachine = new VendingMachine();
+    	vendingMachine = new VendingMachine();
         admin = new Admin("admin123!");
         greenDots = new JLabel[drinks.length];
+        blueDots = new JLabel[drinks.length];
+        drinkButtons = new JButton[drinks.length];
         createAndShowGUI();
     }
 
@@ -57,7 +63,7 @@ public class VendingMachineGUI {
         layeredPane.add(amountLabel, JLayeredPane.PALETTE_LAYER);
 
         // 반환 버튼 추가
-        addReturnButton(layeredPane, 400, 382, 45, 22); // 위치와 크기를 조정하여 반환 버튼 추가
+        addReturnButton(layeredPane, 400, 382, 45, 22);
 
         mainFrame.add(layeredPane);
         mainFrame.pack();
@@ -90,8 +96,9 @@ public class VendingMachineGUI {
             priceLabel.setForeground(Color.WHITE);
             pane.add(priceLabel, JLayeredPane.PALETTE_LAYER);
 
-            JButton button = createDrinkButton(drink, buttonX, buttonY, buttonWidth, buttonHeight);
+            JButton button = createDrinkButton(drink, buttonX, buttonY, buttonWidth, buttonHeight, dotIndex);
             pane.add(button, JLayeredPane.PALETTE_LAYER);
+            drinkButtons[dotIndex] = button;
 
             BufferedImage greenDotImg = ImageIO.read(new File("src/green.png"));
             Image scaledGreenDotImg = greenDotImg.getScaledInstance(10, 10, Image.SCALE_SMOOTH);
@@ -103,12 +110,22 @@ public class VendingMachineGUI {
             pane.add(greenDotLabel, JLayeredPane.PALETTE_LAYER);
             greenDots[dotIndex] = greenDotLabel;
 
+            BufferedImage blueDotImg = ImageIO.read(new File("src/blue.png"));
+            Image scaledBlueDotImg = blueDotImg.getScaledInstance(10, 10, Image.SCALE_SMOOTH);
+            ImageIcon blueDotIcon = new ImageIcon(scaledBlueDotImg);
+
+            JLabel blueDotLabel = new JLabel(blueDotIcon);
+            blueDotLabel.setBounds(greenDotX + 15, greenDotY, 10, 10);
+            blueDotLabel.setVisible(false);
+            pane.add(blueDotLabel, JLayeredPane.PALETTE_LAYER);
+            blueDots[dotIndex] = blueDotLabel;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private JButton createDrinkButton(Drink drink, int x, int y, int width, int height) {
+    private JButton createDrinkButton(Drink drink, int x, int y, int width, int height, int dotIndex) {
         JButton button = new JButton();
         button.setBounds(x, y, width, height);
         button.setOpaque(false);
@@ -117,16 +134,22 @@ public class VendingMachineGUI {
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                handleDrinkSelection(drink);
+                handleDrinkSelection(drink, dotIndex);
             }
         });
 
         return button;
     }
 
-    private void handleDrinkSelection(Drink drink) {
+    private void handleDrinkSelection(Drink drink, int dotIndex) {
+        if (drink.isOutOfStock()) {
+            JOptionPane.showMessageDialog(null, "품절된 음료입니다.");
+            return;
+        }
+
         if (currentAmount >= drink.getPrice()) {
             currentAmount -= drink.getPrice();
+            drink.reduceStock();
             amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
             if (drink.getKoreanName().equals("물")) {
                 JOptionPane.showMessageDialog(null, drink.getKoreanName() + "을 구입했습니다.");
@@ -134,6 +157,7 @@ public class VendingMachineGUI {
                 JOptionPane.showMessageDialog(null, drink.getKoreanName() + "를 구입했습니다.");
             }
             updateGreenDots();
+            updateDrinkAvailability(dotIndex);
         } else {
             JOptionPane.showMessageDialog(null, "금액이 부족합니다.");
         }
@@ -141,11 +165,22 @@ public class VendingMachineGUI {
 
     private void updateGreenDots() {
         for (int i = 0; i < drinks.length; i++) {
-            if (currentAmount >= drinks[i].getPrice()) {
+            if (currentAmount >= drinks[i].getPrice() && !drinks[i].isOutOfStock()) {
                 greenDots[i].setVisible(true);
             } else {
                 greenDots[i].setVisible(false);
             }
+        }
+    }
+
+    private void updateDrinkAvailability(int dotIndex) {
+        if (drinks[dotIndex].isOutOfStock()) {
+            blueDots[dotIndex].setVisible(true);
+            drinkButtons[dotIndex].setEnabled(false);
+            greenDots[dotIndex].setVisible(false);
+        } else {
+            blueDots[dotIndex].setVisible(false);
+            drinkButtons[dotIndex].setEnabled(true);
         }
     }
 
