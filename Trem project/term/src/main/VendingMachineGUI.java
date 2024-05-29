@@ -49,12 +49,12 @@ public class VendingMachineGUI {
 
         JLayeredPane layeredPane = new VendingMachineUI();
 
-        addDrink(layeredPane, drinks[0], 290, 55, 30, 75, "src/water.png", 273, 129, 65, 20, 290, 140, 65, 20, 270, 150, 0);
-        addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 140, 65, 20, 335, 150, 1);
-        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 403, 129, 65, 20, 418, 140, 65, 20, 402, 149, 2);
-        addDrink(layeredPane, drinks[3], 480, 52, 43, 80, "src/high.png", 471, 129, 65, 20, 480, 140, 65, 20, 470, 150, 3);
-        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 274, 236, 65, 20, 287, 250, 65, 20, 270, 258, 4);
-        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 236, 73, 20, 352, 250, 73, 20, 335, 257, 5);
+        addDrink(layeredPane, drinks[0], 290, 55, 30, 75, "src/water.png", 273, 129, 65, 20, 285, 150, 40, 10, 270, 150, 0);
+        addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 150, 40, 10, 335, 150, 1);
+        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 403, 129, 65, 20, 418, 150, 40, 10, 402, 149, 2);
+        addDrink(layeredPane, drinks[3], 480, 52, 43, 80, "src/high.png", 471, 129, 65, 20, 480, 150, 40, 10, 470, 150, 3);
+        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 274, 236, 65, 20, 287, 255, 40, 10, 270, 258, 4);
+        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 236, 73, 20, 350, 255, 40, 10, 335, 257, 5);
 
         addRedCircleButton(layeredPane, 474, 308, 30, 30);
 
