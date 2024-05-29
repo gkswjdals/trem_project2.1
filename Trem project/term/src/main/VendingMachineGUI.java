@@ -12,10 +12,13 @@ import javax.imageio.ImageIO;
 public class VendingMachineGUI {
     private VendingMachine vendingMachine;
     private Admin admin;
-    private int currentAmount = 0;
+    private Integer currentAmount = 0; // 동적 할당을 위한 Wrapper 클래스 사용
     private JFrame mainFrame;
     private JLabel amountLabel;
     private JLabel[] greenDots; // Array for green dots
+
+    private final int MAX_CASH_LIMIT = 5000;
+    private final int MAX_TOTAL_LIMIT = 7000;
 
     private Drink[] drinks = {
         new Drink("water", "물", 450),
@@ -42,13 +45,15 @@ public class VendingMachineGUI {
 
         // 음료수 버튼 추가
         addDrink(layeredPane, drinks[0], 290, 55, 30, 75, "src/water.png", 273, 129, 65, 20, 290, 140, 65, 20, 270, 150, 0);
-        addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 140, 65, 20, 335, 150, 1); // 커피 초록색 점 위치 조정
-        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 403, 129, 65, 20, 418, 140, 65, 20, 402, 149, 2); // 이온음료 초록색 점 위치 조정
+        addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 140, 65, 20, 335, 150, 1);
+        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 403, 129, 65, 20, 418, 140, 65, 20, 402, 149, 2);
         addDrink(layeredPane, drinks[3], 480, 52, 43, 80, "src/high.png", 471, 129, 65, 20, 480, 140, 65, 20, 470, 150, 3);
-        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 274, 236, 65, 20, 287, 250, 65, 20, 270, 258, 4); // 탄산음료 초록색 점 위치 조정
-        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 236, 73, 20, 352, 250, 73, 20, 335, 257, 5); // 특화음료 초록색 점 위치 조정
+        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 274, 236, 65, 20, 287, 250, 65, 20, 270, 258, 4);
+        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 236, 73, 20, 352, 250, 73, 20, 335, 257, 5);
 
         // 음료수 버튼의 숫자의 의미
+        // (JLayeredPane pane, Drink drink, imgX, imgY, imgWidth, imgHeight, imagePath, labelX, labelY, labelWidth, labelHeight, 
+        //		buttonX, buttonY, buttonWidth, buttonHeight, greenDotX, greenDotY, dotIndex)
         // imgX, imgY: 음료 이미지의 X, Y 좌표
         // imgWidth, imgHeight: 음료 이미지의 너비와 높이
         // labelX, labelY: 음료 이름 라벨의 X, Y 좌표
@@ -147,6 +152,7 @@ public class VendingMachineGUI {
                 JOptionPane.showMessageDialog(null, drink.getKoreanName() + "를 구입했습니다.");
             }
             updateGreenDots(); // Update green dots after purchase
+            resetCurrentAmount(); // 금액 사용 후 동적 할당 해제
         } else {
             JOptionPane.showMessageDialog(null, "금액이 부족합니다.");
         }
@@ -160,6 +166,10 @@ public class VendingMachineGUI {
                 greenDots[i].setVisible(false);
             }
         }
+    }
+
+    private void resetCurrentAmount() {
+        currentAmount = 0; // 동적 할당 해제
     }
 
     private void addRedCircleButton(JLayeredPane pane, int x, int y, int width, int height) {
@@ -229,8 +239,14 @@ public class VendingMachineGUI {
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                currentAmount += amount;
-                amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
+                int newAmount = currentAmount + amount;
+                if ((amount == 1000 && currentAmount + amount <= MAX_CASH_LIMIT) ||
+                    (amount != 1000 && newAmount <= MAX_TOTAL_LIMIT)) {
+                    currentAmount += amount;
+                    amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
+                } else {
+                    JOptionPane.showMessageDialog(null, "입력할 수 있는 금액의 상한선을 초과했습니다.");
+                }
             }
         });
 
