@@ -1,18 +1,36 @@
 package main;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class VendingMachine {
     private List<Product> products;
     private List<Coin> coins;
     private int currentAmount;
 
+    // 기본 생성자
     public VendingMachine() {
+        this(10); // 기본적으로 각 동전별로 10개씩 초기화
+    }
+
+    // 오버로드된 생성자
+    public VendingMachine(int initialCoinCount) {
         products = new ArrayList<>();
         coins = new ArrayList<>();
         initializeProducts();
-        initializeCoins();
+        initializeCoins(initialCoinCount);
+    }
+
+    // 동전 초기화 메소드
+    private void initializeCoins(int initialCoinCount) {
+        coins.add(new Coin(10, initialCoinCount));
+        coins.add(new Coin(50, initialCoinCount));
+        coins.add(new Coin(100, initialCoinCount));
+        coins.add(new Coin(500, initialCoinCount));
+        coins.add(new Coin(1000, initialCoinCount / 2));  // 지폐는 초기값의 절반으로 설정
     }
 
     private void initializeProducts() {
@@ -22,14 +40,6 @@ public class VendingMachine {
         products.add(new Product("고급커피", 700, 10));
         products.add(new Product("탄산음료", 750, 10));
         products.add(new Product("특화음료", 800, 10));
-    }
-
-    private void initializeCoins() {
-        coins.add(new Coin(10, 10));
-        coins.add(new Coin(50, 10));
-        coins.add(new Coin(100, 10));
-        coins.add(new Coin(500, 10));
-        coins.add(new Coin(1000, 5));  // 지폐는 5장만 허용
     }
 
     public void insertCoin(int denomination) {
@@ -57,8 +67,51 @@ public class VendingMachine {
         return currentAmount;
     }
 
-    public void returnCoins() {
-        currentAmount = 0;
+    public int returnCoins() {
+        int totalReturned = 0;
+        List<Coin> returnCoins = new ArrayList<>();
+
+        // 큰 동전부터 반환하기 위해 동전 리스트를 정렬
+        coins.sort(Comparator.comparingInt(Coin::getDenomination).reversed());
+
+        for (Coin coin : coins) {
+            int count = 0;
+            while (currentAmount >= coin.getDenomination() && coin.getCount() > 0) {
+                coin.reduceCount(1);
+                currentAmount -= coin.getDenomination();
+                totalReturned += coin.getDenomination();
+                count++;
+            }
+            if (count > 0) {
+                returnCoins.add(new Coin(coin.getDenomination(), count));
+            }
+        }
+
+        // 반환된 동전을 표시
+        if (totalReturned > 0) {
+            displayReturnCoins(returnCoins);
+        } else {
+            JOptionPane.showMessageDialog(null, "거스름돈 없음");
+        }
+
+        return totalReturned;
+    }
+
+    private void displayReturnCoins(List<Coin> returnCoins) {
+        StringBuilder message = new StringBuilder("반환된 금액:\n");
+        for (Coin coin : returnCoins) {
+            message.append(coin.getDenomination()).append("원: ").append(coin.getCount()).append("개\n");
+        }
+        JOptionPane.showMessageDialog(null, message.toString());
+    }
+
+    private void addCoins(int denomination, int count) {
+        for (Coin coin : coins) {
+            if (coin.getDenomination() == denomination) {
+                coin.addCount(count);
+                break;
+            }
+        }
     }
 
     public List<Product> getProducts() {
