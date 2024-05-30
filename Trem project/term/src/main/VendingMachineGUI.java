@@ -8,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import java.util.List;
-import java.util.ArrayList;
 
 public class VendingMachineGUI {
     private VendingMachine vendingMachine;
@@ -227,7 +225,7 @@ public class VendingMachineGUI {
 
     private void returnCoins() {
         int returnedAmount = vendingMachine.returnCoins();
-        currentAmount = 0;
+        currentAmount = vendingMachine.getCurrentAmount(); // 현재 투입된 금액을 정확히 반영
         amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
         updateGreenDots();
     }
@@ -275,7 +273,7 @@ public class VendingMachineGUI {
                 if ((amount == 1000 && currentAmount + amount <= MAX_CASH_LIMIT) ||
                     (amount != 1000 && newAmount <= MAX_TOTAL_LIMIT)) {
                     currentAmount += amount;
-                    vendingMachine.insertCoin(amount); // 추가된 부분
+                    vendingMachine.insertCoin(amount); 
                     amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
                 } else {
                     JOptionPane.showMessageDialog(null, "입력할 수 있는 금액의 상한선을 초과했습니다.");

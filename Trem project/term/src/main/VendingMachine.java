@@ -57,9 +57,11 @@ public class VendingMachine {
             if (product.getName().equals(productName) && !product.isOutOfStock() && currentAmount >= product.getPrice()) {
                 product.reduceStock();
                 currentAmount -= product.getPrice();
+                JOptionPane.showMessageDialog(null, productName + "를(을) 구입하였습니다.");
                 return true;
             }
         }
+        JOptionPane.showMessageDialog(null, "잔액이 부족하거나 재고가 없습니다.");
         return false;
     }
 
@@ -70,15 +72,19 @@ public class VendingMachine {
     public int returnCoins() {
         int totalReturned = 0;
         List<Coin> returnCoins = new ArrayList<>();
+        int remainingAmount = currentAmount;
 
-        // 큰 동전부터 반환하기 위해 동전 리스트를 정렬
-        coins.sort(Comparator.comparingInt(Coin::getDenomination).reversed());
+        // 재고가 많은 동전부터 반환하기 위해 동전 리스트를 정렬
+        coins.sort((c1, c2) -> {
+            int countCompare = Integer.compare(c2.getCount(), c1.getCount());
+            return countCompare != 0 ? countCompare : Integer.compare(c2.getDenomination(), c1.getDenomination());
+        });
 
         for (Coin coin : coins) {
             int count = 0;
-            while (currentAmount >= coin.getDenomination() && coin.getCount() > 0) {
+            while (remainingAmount >= coin.getDenomination() && coin.getCount() > 0) {
                 coin.reduceCount(1);
-                currentAmount -= coin.getDenomination();
+                remainingAmount -= coin.getDenomination();
                 totalReturned += coin.getDenomination();
                 count++;
             }
@@ -86,6 +92,8 @@ public class VendingMachine {
                 returnCoins.add(new Coin(coin.getDenomination(), count));
             }
         }
+
+        currentAmount = remainingAmount;
 
         // 반환된 동전을 표시
         if (totalReturned > 0) {
