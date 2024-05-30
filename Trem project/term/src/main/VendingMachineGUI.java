@@ -80,16 +80,16 @@ public class VendingMachineGUI {
             imageLabel.setOpaque(false);
             pane.add(imageLabel, JLayeredPane.PALETTE_LAYER);
 
-            JLabel nameLabel = new JLabel(drink.getName());
+            JLabel nameLabel = new JLabel(drink.getKoreanName());
             nameLabel.setBounds(labelX, labelY, labelWidth, labelHeight);
-            nameLabel.setFont(new Font("Arial", Font.BOLD, 10));
+            nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 10));
             nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
             nameLabel.setVerticalAlignment(SwingConstants.CENTER);
             pane.add(nameLabel, JLayeredPane.PALETTE_LAYER);
 
             JLabel priceLabel = new JLabel(drink.getPrice() + "");
             priceLabel.setBounds(labelX + 2, labelY + 16, labelWidth, labelHeight);
-            priceLabel.setFont(new Font("Arial", Font.BOLD, 10));
+            priceLabel.setFont(new Font("맑은 고딕", Font.BOLD, 10));
             priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
             priceLabel.setVerticalAlignment(SwingConstants.CENTER);
             priceLabel.setForeground(Color.WHITE);
@@ -123,6 +123,7 @@ public class VendingMachineGUI {
             e.printStackTrace();
         }
     }
+
 
     private JButton createDrinkButton(Drink drink, int x, int y, int width, int height, int dotIndex) {
         JButton button = new JButton();
