@@ -58,7 +58,6 @@ public class VendingMachine {
             if (product.getName().equals(productName) && !product.isOutOfStock() && currentAmount >= product.getPrice()) {
                 product.reduceStock(); // 제품 재고 감소
                 currentAmount -= product.getPrice(); // 현재 투입 금액에서 제품 가격 차감
-                JOptionPane.showMessageDialog(null, productName + "를(을) 구입하였습니다."); // 구매 메시지 표시
                 return true; // 구매 성공
             }
         }

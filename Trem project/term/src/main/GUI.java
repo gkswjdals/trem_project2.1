@@ -227,7 +227,6 @@ public class GUI {
     private void returnCoins() {
         int returnedAmount = vendingMachine.returnCoins();
         currentAmount = vendingMachine.getCurrentAmount(); // 현재 투입된 금액을 정확히 반영
-        JOptionPane.showMessageDialog(mainFrame, "반환된 금액: " + returnedAmount + " 원");
         amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
         updateGreenDots();
     }
