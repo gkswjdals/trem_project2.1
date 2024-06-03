@@ -16,6 +16,8 @@ public class GUI {
     private JFrame mainFrame;
     private JFrame changeProductDetailsFrame;
     private JFrame adminFrame;
+    private JFrame refillStockFrame;
+    private JFrame refillCoinsFrame;
     private JLabel amountLabel;
     private JLabel[] greenDots;
     private JLabel[] stockLabels;
@@ -57,14 +59,14 @@ public class GUI {
         addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 273, 235, 65, 20, 287, 255, 40, 10, 270, 258, 4);
         addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 235, 73, 20, 350, 255, 40, 10, 335, 257, 5);
 
-        addRedCircleButton(layeredPane, 474, 308, 30, 30);
+        addRedCircleButton(layeredPane, 499, 312, 40, 38);
 
         amountLabel = new JLabel("현재 투입된 금액 : " + currentAmount + " 원");
         amountLabel.setBounds(600, 20, 200, 30);
         layeredPane.add(amountLabel, JLayeredPane.PALETTE_LAYER);
 
         // 반환 버튼 추가
-        addReturnButton(layeredPane, 400, 382, 45, 22);
+        addReturnButton(layeredPane, 404, 378, 45, 35, 45, 35); // 버튼 크기: 50x30, 이미지 크기: 45x22
 
         mainFrame.add(layeredPane);
         mainFrame.pack();
@@ -194,7 +196,7 @@ public class GUI {
         button.setBorderPainted(false);
 
         try {
-            BufferedImage buttonIcon = ImageIO.read(new File("src/red.png"));
+            BufferedImage buttonIcon = ImageIO.read(new File("src/coin.png"));
             Image scaledIcon = buttonIcon.getScaledInstance(width, height, Image.SCALE_SMOOTH);
             button.setIcon(new ImageIcon(scaledIcon));
         } catch (IOException e) {
@@ -210,12 +212,20 @@ public class GUI {
         pane.add(button, JLayeredPane.PALETTE_LAYER);
     }
 
-    private void addReturnButton(JLayeredPane pane, int x, int y, int width, int height) {
-        JButton button = new JButton("r");
-        button.setBounds(x, y, width, height);
-        button.setFont(new Font("Arial", Font.BOLD, 9));
-        button.setForeground(Color.BLACK);
-        button.setBackground(Color.WHITE);
+    private void addReturnButton(JLayeredPane pane, int x, int y, int buttonWidth, int buttonHeight, int imageWidth, int imageHeight) {
+        JButton button = new JButton();
+        button.setBounds(x, y, buttonWidth, buttonHeight);
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+
+        try {
+            BufferedImage buttonIcon = ImageIO.read(new File("src/return.png")); // 이미지 파일 경로
+            Image scaledIcon = buttonIcon.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            button.setIcon(new ImageIcon(scaledIcon));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -225,6 +235,8 @@ public class GUI {
 
         pane.add(button, JLayeredPane.PALETTE_LAYER);
     }
+
+
 
     private void returnCoins() {
         int returnedAmount = vendingMachine.returnCoins();
@@ -241,11 +253,11 @@ public class GUI {
         JLayeredPane newPane = new JLayeredPane();
         newPane.setPreferredSize(new Dimension(700, 250));
 
-        addMoneyButton(newPane, 10, 45, 30, 70, 70);
-        addMoneyButton(newPane, 50, 155, 30, 70, 70);
-        addMoneyButton(newPane, 100, 265, 30, 70, 70);
-        addMoneyButton(newPane, 500, 375, 30, 70, 70);
-        addMoneyButton(newPane, 1000, 485, 30, 70, 70);
+        addMoneyButton(newPane, 10, 45, 30, 70, 70, "src/10.png", 70, 70);   // 각 버튼에 맞는 이미지 경로 지정
+        addMoneyButton(newPane, 50, 155, 30, 70, 70, "src/50.png", 70, 70);  // 각 버튼에 맞는 이미지 경로 지정
+        addMoneyButton(newPane, 100, 265, 30, 70, 70, "src/100.png", 70, 70); // 각 버튼에 맞는 이미지 경로 지정
+        addMoneyButton(newPane, 500, 375, 30, 70, 70, "src/500.png", 70, 70); // 각 버튼에 맞는 이미지 경로 지정
+        addMoneyButton(newPane, 1000, 485, 30, 150, 70, "src/1000.png", 150, 70); // 각 버튼에 맞는 이미지 경로 지정
 
         JButton completeButton = new JButton("투입완료");
         completeButton.setBounds(540, 140, 120, 50);
@@ -263,12 +275,20 @@ public class GUI {
         newFrame.setVisible(true);
     }
 
-    private void addMoneyButton(JLayeredPane pane, int amount, int x, int y, int width, int height) {
-        JButton button = new JButton(String.valueOf(amount));
-        button.setBounds(x, y, width, height);
+    private void addMoneyButton(JLayeredPane pane, int amount, int x, int y, int buttonWidth, int buttonHeight, String imagePath, int imageWidth, int imageHeight) {
+        JButton button = new JButton();
+        button.setBounds(x, y, buttonWidth, buttonHeight);
         button.setOpaque(false);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
+
+        try {
+            BufferedImage buttonIcon = ImageIO.read(new File(imagePath)); // 각 버튼에 맞는 이미지 파일 경로
+            Image scaledIcon = buttonIcon.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            button.setIcon(new ImageIcon(scaledIcon));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -286,6 +306,8 @@ public class GUI {
 
         pane.add(button, JLayeredPane.PALETTE_LAYER);
     }
+
+
 
     // 관리자 모드로 전환하는 메소드
     public void switchToAdminMode() {
@@ -360,7 +382,11 @@ public class GUI {
     }
 
     private void showRefillStockFrame() {
-        JFrame refillStockFrame = new JFrame("재고 보충");
+        if (adminFrame != null) {
+            adminFrame.dispose(); // 기존의 관리자 모드 창을 닫음
+        }
+
+        refillStockFrame = new JFrame("재고 보충");
         refillStockFrame.setSize(400, 300);
         refillStockFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -374,8 +400,8 @@ public class GUI {
                 admin.refillStock(vendingMachine, drinks[index].getKoreanName(), 10);
                 drinks[index].refillStock(10); // Drink 객체의 재고도 업데이트
                 JOptionPane.showMessageDialog(refillStockPanel, drinks[index].getKoreanName() + "의 재고가 10개 보충되었습니다.");
-                showStockStatus(); // 재고 보충 후 전체 재고 현황을 표시
-                updateBlueDots(); // 재고 상태 업데이트
+                refillStockFrame.dispose(); // 재고 보충 창을 닫음
+                showAdminFrame(); // 관리자 모드 창을 다시 염
             });
             refillStockPanel.add(button);
         }
@@ -384,47 +410,32 @@ public class GUI {
         refillStockFrame.setVisible(true);
     }
 
-
-
-
-    private void refillStock(String productName) {
-        String amountStr = JOptionPane.showInputDialog("추가할 수량을 입력하세요:");
-        int amount;
-        try {
-            amount = Integer.parseInt(amountStr);
-            admin.refillStock(vendingMachine, productName, amount);
-            showStockStatus(); // 재고 보충 후 전체 재고 현황을 표시
-            updateBlueDots(); // 재고 상태 업데이트
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(mainFrame, "유효한 숫자를 입력하세요.");
-        }
-    }
-
     private void showRefillCoinsFrame() {
-        JFrame refillCoinsFrame = new JFrame("화폐 보충");
+        if (adminFrame != null) {
+            adminFrame.dispose(); // 기존의 관리자 모드 창을 닫음
+        }
+
+        refillCoinsFrame = new JFrame("화폐 보충");
         refillCoinsFrame.setSize(400, 300);
         refillCoinsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel refillCoinsPanel = new JPanel();
         refillCoinsPanel.setLayout(new GridLayout(0, 2));
 
-        addRefillCoinButton(refillCoinsPanel, 10);
-        addRefillCoinButton(refillCoinsPanel, 50);
-        addRefillCoinButton(refillCoinsPanel, 100);
-        addRefillCoinButton(refillCoinsPanel, 500);
-        addRefillCoinButton(refillCoinsPanel, 1000);
+        int[] coinValues = {10, 50, 100, 500, 1000};
+        for (int coinValue : coinValues) {
+            JButton button = new JButton(coinValue + "원");
+            button.addActionListener(e -> {
+                admin.refillCoins(vendingMachine, coinValue, 10);
+                JOptionPane.showMessageDialog(refillCoinsPanel, coinValue + "원 화폐가 10개 보충되었습니다.");
+                refillCoinsFrame.dispose(); // 화폐 보충 창을 닫음
+                showAdminFrame(); // 관리자 모드 창을 다시 염
+            });
+            refillCoinsPanel.add(button);
+        }
 
         refillCoinsFrame.add(refillCoinsPanel, BorderLayout.CENTER);
         refillCoinsFrame.setVisible(true);
-    }
-
-    private void addRefillCoinButton(JPanel panel, int coinValue) {
-        JButton button = new JButton(coinValue + "원");
-        button.addActionListener(e -> {
-            admin.refillCoins(vendingMachine, coinValue, 10);
-            JOptionPane.showMessageDialog(panel, coinValue + "원 화폐가 10개 보충되었습니다.");
-        });
-        panel.add(button);
     }
 
     private void showChangeProductDetailsFrame() {
@@ -468,8 +479,6 @@ public class GUI {
         }
     }
 
-
-
     private void updateProductLabels() {
         for (int i = 0; i < drinks.length; i++) {
             Product product = vendingMachine.getProducts().get(i);
@@ -481,8 +490,6 @@ public class GUI {
         }
         showAdminFrame();
     }
-
-
 
     private void updateBlueDots() {
         for (int i = 0; i < drinks.length; i++) {
