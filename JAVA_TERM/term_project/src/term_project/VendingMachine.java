@@ -113,14 +113,26 @@ public class VendingMachine {
         return coins;
     }
 
+    // 재고 보충 메소드
     public void refillStock(String productName, int amount) {
         for (Product product : products) {
             if (product.getName().equals(productName)) {
                 product.refillStock(amount);
-                JOptionPane.showMessageDialog(null, productName + " 재고가 보충되었습니다.");
-                break;
+                return;
             }
         }
+        JOptionPane.showMessageDialog(null, "제품을 찾을 수 없습니다.");
+    }
+
+    public void refillCoins(int denomination, int count) {
+        for (Coin coin : coins) {
+            if (coin.getDenomination() == denomination) {
+                coin.addCount(count);
+                JOptionPane.showMessageDialog(null, denomination + "원 화폐가 " + count + "개 보충되었습니다.");
+                return;
+            }
+        }
+        JOptionPane.showMessageDialog(null, "해당 화폐를 찾을 수 없습니다.");
     }
 
     public void printCoinStatus() {

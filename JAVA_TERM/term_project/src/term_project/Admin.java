@@ -65,4 +65,8 @@ public class Admin {
     public void collectCoins(VendingMachine vendingMachine) {
         vendingMachine.collectCoins();
     }
+
+    public void refillCoins(VendingMachine vendingMachine, int denomination, int count) {
+        vendingMachine.refillCoins(denomination, count);
+    }
 }

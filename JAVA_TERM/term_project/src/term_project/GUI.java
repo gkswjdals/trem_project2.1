@@ -329,6 +329,11 @@ public class GUI {
         coinStatusButton.addActionListener(e -> admin.checkCoinStatus(vendingMachine));
         adminPanel.add(coinStatusButton);
 
+        // 화폐 보충 버튼 추가
+        JButton refillCoinsButton = new JButton("화폐 보충");
+        refillCoinsButton.addActionListener(e -> showRefillCoinsFrame());
+        adminPanel.add(refillCoinsButton);
+
         JButton collectCoinsButton = new JButton("수금");
         collectCoinsButton.addActionListener(e -> admin.collectCoins(vendingMachine));
         adminPanel.add(collectCoinsButton);
@@ -351,14 +356,59 @@ public class GUI {
 
     private void refillStock() {
         String productName = JOptionPane.showInputDialog("제품 이름을 입력하세요:");
-        String amountStr = JOptionPane.showInputDialog("추가할 수량을 입력하세요:");
-        int amount;
-        try {
-            amount = Integer.parseInt(amountStr);
-            admin.refillStock(vendingMachine, productName, amount);
-            showStockStatus(); // 재고 보충 후 전체 재고 현황을 표시
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(mainFrame, "유효한 숫자를 입력하세요.");
+        if (productName != null && !productName.isEmpty()) {
+            String amountStr = JOptionPane.showInputDialog("추가할 수량을 입력하세요:");
+            int amount;
+            try {
+                amount = Integer.parseInt(amountStr);
+                admin.refillStock(vendingMachine, productName, amount);
+                showStockStatus(); // 재고 보충 후 전체 재고 현황을 표시
+                updateBlueDots(); // 재고 상태 업데이트
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(mainFrame, "유효한 숫자를 입력하세요.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(mainFrame, "유효한 제품 이름을 입력하세요.");
+        }
+    }
+
+    // 화폐 보충 창 표시 메소드
+    private void showRefillCoinsFrame() {
+        JFrame refillCoinsFrame = new JFrame("화폐 보충");
+        refillCoinsFrame.setSize(400, 300);
+        refillCoinsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel refillCoinsPanel = new JPanel();
+        refillCoinsPanel.setLayout(new GridLayout(0, 2));
+
+        addRefillCoinButton(refillCoinsPanel, 10);
+        addRefillCoinButton(refillCoinsPanel, 50);
+        addRefillCoinButton(refillCoinsPanel, 100);
+        addRefillCoinButton(refillCoinsPanel, 500);
+        addRefillCoinButton(refillCoinsPanel, 1000);
+
+        refillCoinsFrame.add(refillCoinsPanel, BorderLayout.CENTER);
+        refillCoinsFrame.setVisible(true);
+    }
+
+    // 화폐 보충 버튼 생성 메소드
+    private void addRefillCoinButton(JPanel panel, int coinValue) {
+        JButton button = new JButton(coinValue + "원");
+        button.addActionListener(e -> {
+            admin.refillCoins(vendingMachine, coinValue, 10);
+        });
+        panel.add(button);
+    }
+
+    private void updateBlueDots() {
+        for (int i = 0; i < drinks.length; i++) {
+            if (drinks[i].isOutOfStock()) {
+                blueDots[i].setVisible(true);
+                drinkButtons[i].setEnabled(false);
+            } else {
+                blueDots[i].setVisible(false);
+                drinkButtons[i].setEnabled(true);
+            }
         }
     }
 
