@@ -1,24 +1,76 @@
 package term_project;
 
-// Admin 클래스 정의
-public class Admin {
-    // 관리자 비밀번호를 저장하는 변수
-    private String password;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Map;
 
-    // 생성자: Admin 클래스의 인스턴스를 생성할 때 비밀번호를 설정
+public class Admin {
+    private String password;
+    private SalesRecord salesRecord;
+
     public Admin(String password) {
-        this.password = password; // 전달된 비밀번호로 password 변수 초기화
+        this.password = password;
+        this.salesRecord = new SalesRecord();
     }
 
-    // 비밀번호 확인 메소드
     public boolean verifyPassword(String inputPassword) {
-        // 입력된 비밀번호와 저장된 비밀번호가 일치하는지 확인
         return this.password.equals(inputPassword);
     }
 
-    // 비밀번호 변경 메소드
     public void changePassword(String newPassword) {
-        // 저장된 비밀번호를 새로운 비밀번호로 변경
         this.password = newPassword;
+    }
+
+    public boolean checkPassword(String inputPassword) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/password.txt"))) {
+            String filePassword = reader.readLine().trim();
+            return inputPassword.equals(filePassword);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void recordSale(String productName, int quantity) {
+        salesRecord.recordSale(productName, quantity);
+    }
+
+    public void printDailySales() {
+        Map<LocalDate, Map<String, Integer>> dailySales = salesRecord.getDailySales();
+        for (Map.Entry<LocalDate, Map<String, Integer>> entry : dailySales.entrySet()) {
+            System.out.println("Date: " + entry.getKey());
+            for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
+                System.out.println("Product: " + productEntry.getKey() + ", Quantity: " + productEntry.getValue());
+            }
+        }
+    }
+
+    public void printMonthlySales() {
+        Map<String, Integer> monthlySales = salesRecord.getMonthlySales();
+        for (Map.Entry<String, Integer> entry : monthlySales.entrySet()) {
+            System.out.println("Month: " + entry.getKey() + ", Quantity: " + entry.getValue());
+        }
+    }
+
+    public void refillStock(VendingMachine vendingMachine, String productName, int amount) {
+        vendingMachine.refillStock(productName, amount);
+    }
+
+    public void checkCoinStatus(VendingMachine vendingMachine) {
+        vendingMachine.printCoinStatus();
+    }
+
+    public void collectCoins(VendingMachine vendingMachine) {
+        vendingMachine.collectCoins();
+    }
+
+    public void refillCoins(VendingMachine vendingMachine, int denomination, int count) {
+        vendingMachine.refillCoins(denomination, count);
+    }
+
+    public void changeProductDetails(VendingMachine vendingMachine, String oldProductName, String newProductName, int newPrice) {
+        vendingMachine.changeProductDetails(oldProductName, newProductName, newPrice);
     }
 }

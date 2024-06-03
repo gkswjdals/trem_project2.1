@@ -14,6 +14,8 @@ public class GUI {
     private Admin admin;
     private Integer currentAmount = 0;
     private JFrame mainFrame;
+    private JFrame changeProductDetailsFrame;
+    private JFrame adminFrame;
     private JLabel amountLabel;
     private JLabel[] greenDots;
     private JLabel[] stockLabels;
@@ -42,7 +44,7 @@ public class GUI {
     }
 
     private void createAndShowGUI() {
-        mainFrame = new JFrame("Vending Machine");
+        mainFrame = new JFrame("자판기");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(800, 600);
 
@@ -50,10 +52,10 @@ public class GUI {
 
         addDrink(layeredPane, drinks[0], 290, 55, 30, 75, "src/water.png", 273, 129, 65, 20, 285, 150, 40, 10, 270, 150, 0);
         addDrink(layeredPane, drinks[1], 348, 55, 40, 78, "src/coffee.png", 337, 129, 65, 20, 348, 150, 40, 10, 335, 150, 1);
-        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 403, 129, 65, 20, 418, 150, 40, 10, 402, 149, 2);
+        addDrink(layeredPane, drinks[2], 418, 55, 40, 78, "src/sport.png", 405, 129, 65, 20, 418, 150, 40, 10, 402, 149, 2);
         addDrink(layeredPane, drinks[3], 480, 52, 43, 80, "src/high.png", 471, 129, 65, 20, 480, 150, 40, 10, 470, 150, 3);
-        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 274, 236, 65, 20, 287, 255, 40, 10, 270, 258, 4);
-        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 236, 73, 20, 350, 255, 40, 10, 335, 257, 5);
+        addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 273, 235, 65, 20, 287, 255, 40, 10, 270, 258, 4);
+        addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 235, 73, 20, 350, 255, 40, 10, 335, 257, 5);
 
         addRedCircleButton(layeredPane, 474, 308, 30, 30);
 
@@ -232,7 +234,7 @@ public class GUI {
     }
 
     private void openNewWindow() {
-        JFrame newFrame = new JFrame("Insert Money");
+        JFrame newFrame = new JFrame("현금 투입");
         newFrame.setSize(700, 250);
         newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -287,35 +289,211 @@ public class GUI {
 
     // 관리자 모드로 전환하는 메소드
     public void switchToAdminMode() {
-        mainFrame.getContentPane().removeAll(); // 모든 컴포넌트 제거
-        JLayeredPane adminPane = new JLayeredPane(); // 새로운 레이어드 패인 생성
-        adminPane.setPreferredSize(new Dimension(800, 600));
+        JPasswordField passwordField = new JPasswordField();
+        int option = JOptionPane.showConfirmDialog(
+                mainFrame, passwordField, "비밀번호를 입력하세요:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        // 돌아가기 버튼 추가
-        JButton backButton = new JButton("돌아가기");
-        backButton.setBounds(650, 500, 100, 30);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                switchToVendingMode(); // 자판기 모드로 전환
+        if (option == JOptionPane.OK_OPTION) {
+            String inputPassword = new String(passwordField.getPassword());
+            if (admin.checkPassword(inputPassword)) {
+                showAdminFrame(); // 관리자 프레임 표시
+            } else {
+                JOptionPane.showMessageDialog(mainFrame, "비밀번호가 틀렸습니다.");
             }
-        });
-        adminPane.add(backButton, JLayeredPane.PALETTE_LAYER);
-
-        // 관리자 모드에 필요한 다른 컴포넌트 추가 가능
-        // 예: 재고 보충, 금액 설정 등
-
-        mainFrame.add(adminPane);
-        mainFrame.revalidate();
-        mainFrame.repaint();
+        }
     }
 
-    // 자판기 모드로 되돌아가는 메소드
-    public void switchToVendingMode() {
-        mainFrame.getContentPane().removeAll(); // 모든 컴포넌트 제거
-        createAndShowGUI(); // 자판기 모드 UI 다시 생성
-        mainFrame.revalidate();
-        mainFrame.repaint();
+    private void showAdminFrame() {
+        adminFrame = new JFrame("관리자 모드");
+        adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        adminFrame.setSize(800, 600);
+
+        JPanel adminPanel = new JPanel();
+        adminPanel.setLayout(new GridLayout(0, 2));
+
+        JButton dailySalesButton = new JButton("일별 매출 출력");
+        dailySalesButton.addActionListener(e -> admin.printDailySales());
+        adminPanel.add(dailySalesButton);
+
+        JButton monthlySalesButton = new JButton("월별 매출 출력");
+        monthlySalesButton.addActionListener(e -> admin.printMonthlySales());
+        adminPanel.add(monthlySalesButton);
+
+        JButton checkStockButton = new JButton("재고 현황");
+        checkStockButton.addActionListener(e -> showStockStatus());
+        adminPanel.add(checkStockButton);
+
+        JButton refillStockButton = new JButton("재고 보충");
+        refillStockButton.addActionListener(e -> showRefillStockFrame());
+        adminPanel.add(refillStockButton);
+
+        JButton coinStatusButton = new JButton("화폐 현황");
+        coinStatusButton.addActionListener(e -> admin.checkCoinStatus(vendingMachine));
+        adminPanel.add(coinStatusButton);
+
+        JButton refillCoinsButton = new JButton("화폐 보충");
+        refillCoinsButton.addActionListener(e -> showRefillCoinsFrame());
+        adminPanel.add(refillCoinsButton);
+
+        JButton changeProductDetailsButton = new JButton("제품 정보 변경");
+        changeProductDetailsButton.addActionListener(e -> showChangeProductDetailsFrame());
+        adminPanel.add(changeProductDetailsButton);
+
+        JButton collectCoinsButton = new JButton("수금");
+        collectCoinsButton.addActionListener(e -> admin.collectCoins(vendingMachine));
+        adminPanel.add(collectCoinsButton);
+
+        JButton backButton = new JButton("돌아가기");
+        backButton.addActionListener(e -> adminFrame.dispose());
+        adminPanel.add(backButton);
+
+        adminFrame.add(adminPanel, BorderLayout.CENTER);
+        adminFrame.setVisible(true);
+    }
+
+    private void showStockStatus() {
+        StringBuilder stockStatus = new StringBuilder();
+        for (Drink drink : drinks) {
+            stockStatus.append(drink.getKoreanName()).append(": ").append(drink.getStock()).append("개\n");
+        }
+        JOptionPane.showMessageDialog(mainFrame, stockStatus.toString(), "재고 현황", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showRefillStockFrame() {
+        JFrame refillStockFrame = new JFrame("재고 보충");
+        refillStockFrame.setSize(400, 300);
+        refillStockFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel refillStockPanel = new JPanel();
+        refillStockPanel.setLayout(new GridLayout(0, 2));
+
+        for (int i = 0; i < drinks.length; i++) {
+            int index = i;
+            JButton button = new JButton(drinks[i].getKoreanName());
+            button.addActionListener(e -> {
+                admin.refillStock(vendingMachine, drinks[index].getKoreanName(), 10);
+                drinks[index].refillStock(10); // Drink 객체의 재고도 업데이트
+                JOptionPane.showMessageDialog(refillStockPanel, drinks[index].getKoreanName() + "의 재고가 10개 보충되었습니다.");
+                showStockStatus(); // 재고 보충 후 전체 재고 현황을 표시
+                updateBlueDots(); // 재고 상태 업데이트
+            });
+            refillStockPanel.add(button);
+        }
+
+        refillStockFrame.add(refillStockPanel, BorderLayout.CENTER);
+        refillStockFrame.setVisible(true);
+    }
+
+
+
+
+    private void refillStock(String productName) {
+        String amountStr = JOptionPane.showInputDialog("추가할 수량을 입력하세요:");
+        int amount;
+        try {
+            amount = Integer.parseInt(amountStr);
+            admin.refillStock(vendingMachine, productName, amount);
+            showStockStatus(); // 재고 보충 후 전체 재고 현황을 표시
+            updateBlueDots(); // 재고 상태 업데이트
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(mainFrame, "유효한 숫자를 입력하세요.");
+        }
+    }
+
+    private void showRefillCoinsFrame() {
+        JFrame refillCoinsFrame = new JFrame("화폐 보충");
+        refillCoinsFrame.setSize(400, 300);
+        refillCoinsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel refillCoinsPanel = new JPanel();
+        refillCoinsPanel.setLayout(new GridLayout(0, 2));
+
+        addRefillCoinButton(refillCoinsPanel, 10);
+        addRefillCoinButton(refillCoinsPanel, 50);
+        addRefillCoinButton(refillCoinsPanel, 100);
+        addRefillCoinButton(refillCoinsPanel, 500);
+        addRefillCoinButton(refillCoinsPanel, 1000);
+
+        refillCoinsFrame.add(refillCoinsPanel, BorderLayout.CENTER);
+        refillCoinsFrame.setVisible(true);
+    }
+
+    private void addRefillCoinButton(JPanel panel, int coinValue) {
+        JButton button = new JButton(coinValue + "원");
+        button.addActionListener(e -> {
+            admin.refillCoins(vendingMachine, coinValue, 10);
+            JOptionPane.showMessageDialog(panel, coinValue + "원 화폐가 10개 보충되었습니다.");
+        });
+        panel.add(button);
+    }
+
+    private void showChangeProductDetailsFrame() {
+        changeProductDetailsFrame = new JFrame("제품 정보 변경");
+        changeProductDetailsFrame.setSize(400, 300);
+        changeProductDetailsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel changeProductDetailsPanel = new JPanel();
+        changeProductDetailsPanel.setLayout(new GridLayout(0, 2));
+
+        for (int i = 0; i < drinks.length; i++) {
+            int index = i;
+            JButton button = new JButton(drinks[i].getKoreanName());
+            button.addActionListener(e -> changeProductDetails(drinks[index].getKoreanName()));
+            changeProductDetailsPanel.add(button);
+        }
+
+        changeProductDetailsFrame.add(changeProductDetailsPanel, BorderLayout.CENTER);
+        changeProductDetailsFrame.setVisible(true);
+    }
+
+    private void changeProductDetails(String oldProductName) {
+        String newProductName = JOptionPane.showInputDialog("새로운 제품 이름을 입력하세요:");
+        if (newProductName != null && !newProductName.isEmpty()) {
+            String newPriceStr = JOptionPane.showInputDialog("새로운 제품 가격을 입력하세요:");
+            int newPrice;
+            try {
+                newPrice = Integer.parseInt(newPriceStr);
+                admin.changeProductDetails(vendingMachine, oldProductName, newProductName, newPrice);
+                updateProductLabels(); // 제품 정보를 업데이트하고
+                changeProductDetailsFrame.dispose(); // 제품 정보 변경 창을 닫음
+                if (adminFrame != null) {
+                    adminFrame.dispose(); // 관리자 모드 창을 닫음
+                }
+                showAdminFrame(); // 관리자 모드 화면 다시 표시
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(mainFrame, "유효한 숫자를 입력하세요.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(mainFrame, "유효한 새로운 제품 이름을 입력하세요.");
+        }
+    }
+
+
+
+    private void updateProductLabels() {
+        for (int i = 0; i < drinks.length; i++) {
+            Product product = vendingMachine.getProducts().get(i);
+            drinks[i] = new Drink(product); // Product 객체를 Drink 객체로 변환
+        }
+        // 제품 정보 업데이트 후 관리자 모드 화면 새로고침
+        if (adminFrame != null) {
+            adminFrame.dispose();
+        }
+        showAdminFrame();
+    }
+
+
+
+    private void updateBlueDots() {
+        for (int i = 0; i < drinks.length; i++) {
+            if (drinks[i].isOutOfStock()) {
+                blueDots[i].setVisible(true);
+                drinkButtons[i].setEnabled(false);
+            } else {
+                blueDots[i].setVisible(false);
+                drinkButtons[i].setEnabled(true);
+            }
+        }
     }
 
     public static void main(String[] args) {
