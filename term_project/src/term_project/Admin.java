@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Admin {
@@ -38,20 +39,11 @@ public class Admin {
     }
 
     public void printDailySales() {
-        Map<LocalDate, Map<String, Integer>> dailySales = salesRecord.getDailySales();
-        for (Map.Entry<LocalDate, Map<String, Integer>> entry : dailySales.entrySet()) {
-            System.out.println("Date: " + entry.getKey());
-            for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
-                System.out.println("Product: " + productEntry.getKey() + ", Quantity: " + productEntry.getValue());
-            }
-        }
+        System.out.println(getDailySalesData());
     }
 
     public void printMonthlySales() {
-        Map<String, Integer> monthlySales = salesRecord.getMonthlySales();
-        for (Map.Entry<String, Integer> entry : monthlySales.entrySet()) {
-            System.out.println("Month: " + entry.getKey() + ", Quantity: " + entry.getValue());
-        }
+        System.out.println(getMonthlySalesData());
     }
 
     public void refillStock(VendingMachine vendingMachine, String productName, int amount) {
@@ -72,5 +64,75 @@ public class Admin {
 
     public void changeProductDetails(VendingMachine vendingMachine, String oldProductName, String newProductName, int newPrice) {
         vendingMachine.changeProductDetails(oldProductName, newProductName, newPrice);
+    }
+
+    public String getDailySalesData() {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Map<String, Integer>> dailySales = readDailySales();
+        for (Map.Entry<String, Map<String, Integer>> entry : dailySales.entrySet()) {
+            sb.append("Date: ").append(entry.getKey()).append("\n");
+            for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
+                sb.append("음료: ").append(productEntry.getKey()).append("\t매출: ").append(productEntry.getValue()).append("\n");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    public String getMonthlySalesData() {
+        StringBuilder sb = new StringBuilder();
+        Map<String, Map<String, Integer>> monthlySales = readMonthlySales();
+        for (Map.Entry<String, Map<String, Integer>> entry : monthlySales.entrySet()) {
+            sb.append(entry.getKey()).append("\n");
+            for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
+                sb.append("음료: ").append(productEntry.getKey()).append("\t매출: ").append(productEntry.getValue()).append("\n");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    private Map<String, Map<String, Integer>> readDailySales() {
+        Map<String, Map<String, Integer>> dailySales = new LinkedHashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("src/daily.txt"))) {
+            String line;
+            String currentDate = null;
+            while ((line = br.readLine()) != null) {
+                if (line.matches("\\d{8}")) { // 날짜 형식
+                    currentDate = line;
+                    dailySales.put(currentDate, new LinkedHashMap<>());
+                } else if (currentDate != null) {
+                    String[] parts = line.split(",");
+                    String product = parts[0];
+                    int quantity = Integer.parseInt(parts[1]);
+                    dailySales.get(currentDate).put(product, quantity);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return dailySales;
+    }
+
+    private Map<String, Map<String, Integer>> readMonthlySales() {
+        Map<String, Map<String, Integer>> monthlySales = new LinkedHashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("src/month.txt"))) {
+            String line;
+            String currentMonth = null;
+            while ((line = br.readLine()) != null) {
+                if (line.matches("\\w+")) { // 월 형식
+                    currentMonth = line;
+                    monthlySales.put(currentMonth, new LinkedHashMap<>());
+                } else if (currentMonth != null) {
+                    String[] parts = line.split(",");
+                    String product = parts[0];
+                    int quantity = Integer.parseInt(parts[1]);
+                    monthlySales.get(currentMonth).put(product, quantity);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return monthlySales;
     }
 }

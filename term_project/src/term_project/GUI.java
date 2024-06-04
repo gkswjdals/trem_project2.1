@@ -236,8 +236,6 @@ public class GUI {
         pane.add(button, JLayeredPane.PALETTE_LAYER);
     }
 
-
-
     private void returnCoins() {
         int returnedAmount = vendingMachine.returnCoins();
         currentAmount = vendingMachine.getCurrentAmount(); // 현재 투입된 금액을 정확히 반영
@@ -254,7 +252,7 @@ public class GUI {
         newPane.setPreferredSize(new Dimension(700, 250));
 
         addMoneyButton(newPane, 10, 45, 30, 70, 70, "src/10.png", 70, 70);   // 각 버튼에 맞는 이미지 경로 지정
-        addMoneyButton(newPane, 50, 155, 30, 70, 70, "src/50.png", 70, 70);  // 각 버튼에 맞는 이미지 경로 지정
+        addMoneyButton(newPane, 50, 130, 7, 120, 120, "src/50.png", 120, 120);  // 각 버튼에 맞는 이미지 경로 지정
         addMoneyButton(newPane, 100, 265, 30, 70, 70, "src/100.png", 70, 70); // 각 버튼에 맞는 이미지 경로 지정
         addMoneyButton(newPane, 500, 375, 30, 70, 70, "src/500.png", 70, 70); // 각 버튼에 맞는 이미지 경로 지정
         addMoneyButton(newPane, 1000, 485, 30, 150, 70, "src/1000.png", 150, 70); // 각 버튼에 맞는 이미지 경로 지정
@@ -307,8 +305,6 @@ public class GUI {
         pane.add(button, JLayeredPane.PALETTE_LAYER);
     }
 
-
-
     // 관리자 모드로 전환하는 메소드
     public void switchToAdminMode() {
         JPasswordField passwordField = new JPasswordField();
@@ -334,11 +330,11 @@ public class GUI {
         adminPanel.setLayout(new GridLayout(0, 2));
 
         JButton dailySalesButton = new JButton("일별 매출 출력");
-        dailySalesButton.addActionListener(e -> admin.printDailySales());
+        dailySalesButton.addActionListener(e -> showSalesData("일별 매출", admin.getDailySalesData()));
         adminPanel.add(dailySalesButton);
 
         JButton monthlySalesButton = new JButton("월별 매출 출력");
-        monthlySalesButton.addActionListener(e -> admin.printMonthlySales());
+        monthlySalesButton.addActionListener(e -> showSalesData("월별 매출", admin.getMonthlySalesData()));
         adminPanel.add(monthlySalesButton);
 
         JButton checkStockButton = new JButton("재고 현황");
@@ -371,6 +367,19 @@ public class GUI {
 
         adminFrame.add(adminPanel, BorderLayout.CENTER);
         adminFrame.setVisible(true);
+    }
+
+    private void showSalesData(String title, String data) {
+        JTextArea textArea = new JTextArea(data);
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(800, 600));
+
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(scrollPane);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     private void showStockStatus() {

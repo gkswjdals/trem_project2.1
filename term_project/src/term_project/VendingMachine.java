@@ -128,7 +128,6 @@ public class VendingMachine {
         for (Coin coin : coins) {
             if (coin.getDenomination() == denomination) {
                 coin.addCount(count);
-                JOptionPane.showMessageDialog(null, denomination + "원 화폐가 " + count + "개 보충되었습니다.");
                 return;
             }
         }
