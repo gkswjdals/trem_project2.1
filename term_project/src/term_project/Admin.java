@@ -1,9 +1,8 @@
 package term_project;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,9 +10,14 @@ public class Admin {
     private String password;
     private SalesRecord salesRecord;
 
+    private Map<String, Integer> dailySalesMap;
+    private Map<String, Integer> monthlySalesMap;
+
     public Admin(String password) {
         this.password = password;
         this.salesRecord = new SalesRecord();
+        this.dailySalesMap = new LinkedHashMap<>();
+        this.monthlySalesMap = new LinkedHashMap<>();
     }
 
     public boolean verifyPassword(String inputPassword) {
@@ -36,6 +40,44 @@ public class Admin {
 
     public void recordSale(String productName, int quantity) {
         salesRecord.recordSale(productName, quantity);
+        dailySalesMap.put(productName, dailySalesMap.getOrDefault(productName, 0) + quantity);
+        monthlySalesMap.put(productName, monthlySalesMap.getOrDefault(productName, 0) + quantity);
+        writeDailySales();
+        writeMonthlySales();
+    }
+
+    private void writeDailySales() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formattedDate = currentDate.format(formatter);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/daily.txt", true))) {
+            writer.write(formattedDate + "\n");
+            for (String product : getProductNames()) {
+                writer.write(product + "," + dailySalesMap.getOrDefault(product, 0) + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeMonthlySales() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
+        String formattedDate = currentDate.format(formatter);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/month.txt", true))) {
+            writer.write(formattedDate + "\n");
+            for (String product : getProductNames()) {
+                writer.write(product + "," + monthlySalesMap.getOrDefault(product, 0) + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String[] getProductNames() {
+        return new String[]{"물", "커피", "이온음료", "고급커피", "탄산음료", "특화음료"};
     }
 
     public void printDailySales() {
@@ -126,20 +168,31 @@ public class Admin {
         return dailySales;
     }
 
-
     private Map<String, Map<String, Integer>> readMonthlySales() {
         Map<String, Map<String, Integer>> monthlySales = new LinkedHashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader("src/month.txt"))) {
             String line;
             String currentMonth = null;
             while ((line = br.readLine()) != null) {
-                if (line.matches("\\w+")) { // 월 형식
+                line = line.trim(); // 앞뒤 공백 제거
+                if (line.isEmpty()) {
+                    continue; // 빈 줄 건너뛰기
+                }
+                if (line.matches("[a-zA-Z]+")) { // 월 형식
                     currentMonth = line;
                     monthlySales.put(currentMonth, new LinkedHashMap<>());
                 } else if (currentMonth != null) {
                     String[] parts = line.split(",");
+                    if (parts.length < 2) {
+                        continue; // 잘못된 형식 건너뛰기
+                    }
                     String product = parts[0];
-                    int quantity = Integer.parseInt(parts[1]);
+                    int quantity;
+                    try {
+                        quantity = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException e) {
+                        continue; // 숫자가 아닌 경우 건너뛰기
+                    }
                     monthlySales.get(currentMonth).put(product, quantity);
                 }
             }

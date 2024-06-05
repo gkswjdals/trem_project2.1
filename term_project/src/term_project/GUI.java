@@ -152,6 +152,7 @@ public class GUI {
         return button;
     }
 
+ // handleDrinkSelection 메소드 전체 수정
     private void handleDrinkSelection(Drink drink, int dotIndex) {
         if (drink.isOutOfStock()) {
             JOptionPane.showMessageDialog(null, "품절된 음료입니다.");
@@ -163,11 +164,16 @@ public class GUI {
             vendingMachine.selectProduct(drink.getKoreanName()); // 추가: vendingMachine의 상태도 업데이트
             drink.reduceStock();
             amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
+            
             if (drink.getKoreanName().equals("물")) {
                 JOptionPane.showMessageDialog(null, drink.getKoreanName() + "을 구입했습니다.");
             } else {
                 JOptionPane.showMessageDialog(null, drink.getKoreanName() + "를 구입했습니다.");
             }
+            
+            // 매출 기록 파일에 저장
+            admin.recordSale(drink.getKoreanName(), 1);
+            
             updateGreenDots();
             updateDrinkAvailability(dotIndex);
         } else {
@@ -251,7 +257,12 @@ public class GUI {
         currentAmount = vendingMachine.getCurrentAmount(); // 현재 투입된 금액을 정확히 반영
         amountLabel.setText("현재 투입된 금액 : " + currentAmount + " 원");
         updateGreenDots();
+        if (currentAmount > 0) {
+            openNewWindow(); // 화폐 입력 창을 연다
+        }
     }
+
+
 
     private void openNewWindow() {
         JFrame newFrame = new JFrame("현금 투입");

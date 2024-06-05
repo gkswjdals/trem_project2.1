@@ -85,34 +85,41 @@ public class VendingMachine {
     }
 
     public int returnCoins() {
-        int totalReturned = currentAmount;
-        List<Coin> returnCoins = new ArrayList<>();
-        int remainingAmount = currentAmount;
+    int totalReturned = currentAmount;
+    List<Coin> returnCoins = new ArrayList<>();
+    int remainingAmount = currentAmount;
 
-        coins.sort((c1, c2) -> Integer.compare(c2.getDenomination(), c1.getDenomination()));
+    coins.sort((c1, c2) -> Integer.compare(c2.getDenomination(), c1.getDenomination()));
 
-        for (Coin coin : coins) {
-            int count = 0;
-            while (remainingAmount >= coin.getDenomination() && coin.getCount() > 0) {
-                coin.reduceCount(1);
-                remainingAmount -= coin.getDenomination();
-                count++;
-            }
-            if (count > 0) {
-                returnCoins.add(new Coin(coin.getDenomination(), count));
-            }
+    for (Coin coin : coins) {
+        int count = 0;
+        while (remainingAmount >= coin.getDenomination() && coin.getCount() > 0) {
+            coin.reduceCount(1);
+            remainingAmount -= coin.getDenomination();
+            count++;
         }
-
-        currentAmount = remainingAmount;
-
-        if (totalReturned > 0) {
-            displayReturnCoins(returnCoins, totalReturned);
-        } else {
-            JOptionPane.showMessageDialog(null, "거스름돈 없음");
+        if (count > 0) {
+            returnCoins.add(new Coin(coin.getDenomination(), count));
         }
-
-        return totalReturned;
     }
+
+    if (remainingAmount > 0) {
+        displayNoReturnCoins(remainingAmount);
+    } else {
+        currentAmount = remainingAmount;
+        displayReturnCoins(returnCoins, totalReturned);
+    }
+
+    return totalReturned;
+}
+
+private void displayNoReturnCoins(int remainingAmount) {
+    StringBuilder message = new StringBuilder("거스름돈 없음: 반환불가능한 금액은 " + remainingAmount + "원 입니다.\n현재 자판기에 남아 있는 화폐 현황:\n");
+    for (Coin coin : coins) {
+        message.append(coin.getDenomination()).append("원: ").append(coin.getCount()).append("개\n");
+    }
+    JOptionPane.showMessageDialog(null, message.toString());
+}
 
     private void displayReturnCoins(List<Coin> returnCoins, int totalReturned) {
         StringBuilder message = new StringBuilder("반환된 금액:\n");
