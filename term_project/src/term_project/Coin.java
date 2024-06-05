@@ -2,7 +2,7 @@ package term_project;
 
 // Coin 클래스 정의
 public class Coin {
-    // 코인의 가격을 저장하는 변수
+    // 코인의 액면가를 저장하는 변수
     private int denomination;
     // 코인의 개수를 저장하는 변수
     private int count;
@@ -13,7 +13,7 @@ public class Coin {
         this.count = count; // 전달된 개수로 count 변수 초기화
     }
 
-    // 가격을 반환하는 메소드
+    // 액면가를 반환하는 메소드
     public int getDenomination() {
         return denomination;
     }
