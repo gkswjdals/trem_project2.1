@@ -1,14 +1,15 @@
 package term_project;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class VendingMachine {
     private List<Product> products;
     private List<Coin> coins;
     private int currentAmount;
     private Admin admin;
+    private Map<String, Integer> dailySales;
 
     public VendingMachine() {
         this(10);
@@ -17,6 +18,7 @@ public class VendingMachine {
     public VendingMachine(int initialCoinCount) {
         products = new ArrayList<>();
         coins = new ArrayList<>();
+        dailySales = new HashMap<>();
         initializeProducts();
         initializeCoins(initialCoinCount);
         admin = new Admin("admin123!"); // 예시로 관리자 추가
@@ -54,12 +56,28 @@ public class VendingMachine {
             if (product.getName().equals(productName) && !product.isOutOfStock() && currentAmount >= product.getPrice()) {
                 product.reduceStock();
                 currentAmount -= product.getPrice();
-                admin.recordSale(productName, 1); // 판매 기록
+                recordSale(product.getPrice()); // 판매 기록
                 return true;
             }
         }
         JOptionPane.showMessageDialog(null, "잔액이 부족하거나 재고가 없습니다.");
         return false;
+    }
+
+    private void recordSale(int amount) {
+        String currentDate = getCurrentDate();
+        int sales = dailySales.getOrDefault(currentDate, 0);
+        sales += amount;
+        dailySales.put(currentDate, sales);
+    }
+
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(new Date());
+    }
+
+    public Map<String, Integer> getDailySales() {
+        return dailySales;
     }
 
     public int getCurrentAmount() {

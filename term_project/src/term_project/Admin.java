@@ -70,7 +70,7 @@ public class Admin {
         StringBuilder sb = new StringBuilder();
         Map<String, Map<String, Integer>> dailySales = readDailySales();
         for (Map.Entry<String, Map<String, Integer>> entry : dailySales.entrySet()) {
-            sb.append("Date: ").append(entry.getKey()).append("\n");
+            sb.append("날짜 : ").append(entry.getKey()).append("\n");
             for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
                 sb.append("음료: ").append(productEntry.getKey()).append("\t매출: ").append(productEntry.getValue()).append("\n");
             }
@@ -98,13 +98,25 @@ public class Admin {
             String line;
             String currentDate = null;
             while ((line = br.readLine()) != null) {
+                line = line.trim(); // 앞뒤 공백 제거
+                if (line.isEmpty()) {
+                    continue; // 빈 줄 건너뛰기
+                }
                 if (line.matches("\\d{8}")) { // 날짜 형식
                     currentDate = line;
                     dailySales.put(currentDate, new LinkedHashMap<>());
                 } else if (currentDate != null) {
                     String[] parts = line.split(",");
+                    if (parts.length < 2) {
+                        continue; // 잘못된 형식 건너뛰기
+                    }
                     String product = parts[0];
-                    int quantity = Integer.parseInt(parts[1]);
+                    int quantity;
+                    try {
+                        quantity = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException e) {
+                        continue; // 숫자가 아닌 경우 건너뛰기
+                    }
                     dailySales.get(currentDate).put(product, quantity);
                 }
             }
@@ -113,6 +125,7 @@ public class Admin {
         }
         return dailySales;
     }
+
 
     private Map<String, Map<String, Integer>> readMonthlySales() {
         Map<String, Map<String, Integer>> monthlySales = new LinkedHashMap<>();
