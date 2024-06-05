@@ -23,6 +23,8 @@ public class GUI {
     private JLabel[] stockLabels;
     private JLabel[] blueDots;
     private JButton[] drinkButtons;
+    private JButton insertCoinButton;
+    private JButton returnButton;
 
     private final int MAX_CASH_LIMIT = 5000;
     private final int MAX_TOTAL_LIMIT = 7000;
@@ -59,14 +61,14 @@ public class GUI {
         addDrink(layeredPane, drinks[4], 287, 164, 35, 76, "src/soda.png", 273, 235, 65, 20, 287, 255, 40, 10, 270, 258, 4);
         addDrink(layeredPane, drinks[5], 352, 164, 33, 73, "src/Special.png", 333, 235, 73, 20, 350, 255, 40, 10, 335, 257, 5);
 
-        addRedCircleButton(layeredPane, 499, 312, 40, 38);
+        insertCoinButton = addRedCircleButton(layeredPane, 499, 312, 40, 38);
 
         amountLabel = new JLabel("현재 투입된 금액 : " + currentAmount + " 원");
         amountLabel.setBounds(600, 20, 200, 30);
         layeredPane.add(amountLabel, JLayeredPane.PALETTE_LAYER);
 
         // 반환 버튼 추가
-        addReturnButton(layeredPane, 404, 378, 45, 35, 45, 35); // 버튼 크기: 50x30, 이미지 크기: 45x22
+        returnButton = addReturnButton(layeredPane, 404, 378, 45, 35, 45, 35); // 버튼 크기: 50x30, 이미지 크기: 45x22
 
         mainFrame.add(layeredPane);
         mainFrame.pack();
@@ -188,7 +190,7 @@ public class GUI {
         }
     }
 
-    private void addRedCircleButton(JLayeredPane pane, int x, int y, int width, int height) {
+    private JButton addRedCircleButton(JLayeredPane pane, int x, int y, int width, int height) {
         JButton button = new JButton();
         button.setBounds(x, y, width, height);
         button.setOpaque(false);
@@ -210,9 +212,10 @@ public class GUI {
         });
 
         pane.add(button, JLayeredPane.PALETTE_LAYER);
+        return button;
     }
 
-    private void addReturnButton(JLayeredPane pane, int x, int y, int buttonWidth, int buttonHeight, int imageWidth, int imageHeight) {
+    private JButton addReturnButton(JLayeredPane pane, int x, int y, int buttonWidth, int buttonHeight, int imageWidth, int imageHeight) {
         JButton button = new JButton();
         button.setBounds(x, y, buttonWidth, buttonHeight);
         button.setOpaque(false);
@@ -234,6 +237,7 @@ public class GUI {
         });
 
         pane.add(button, JLayeredPane.PALETTE_LAYER);
+        return button;
     }
 
     private void returnCoins() {
@@ -305,7 +309,27 @@ public class GUI {
         pane.add(button, JLayeredPane.PALETTE_LAYER);
     }
 
-    // 관리자 모드로 전환하는 메소드
+    // 자판기 버튼 비활성화 메소드
+    private void disableVendingMachineButtons() {
+        for (JButton button : drinkButtons) {
+            button.setEnabled(false);
+        }
+        amountLabel.setEnabled(false);
+        insertCoinButton.setEnabled(false);
+        returnButton.setEnabled(false);
+    }
+
+    // 자판기 버튼 활성화 메소드
+    private void enableVendingMachineButtons() {
+        for (JButton button : drinkButtons) {
+            button.setEnabled(true);
+        }
+        amountLabel.setEnabled(true);
+        insertCoinButton.setEnabled(true);
+        returnButton.setEnabled(true);
+    }
+
+    // switchToAdminMode 메소드 수정
     public void switchToAdminMode() {
         JPasswordField passwordField = new JPasswordField();
         int option = JOptionPane.showConfirmDialog(
@@ -314,6 +338,7 @@ public class GUI {
         if (option == JOptionPane.OK_OPTION) {
             String inputPassword = new String(passwordField.getPassword());
             if (admin.checkPassword(inputPassword)) {
+                disableVendingMachineButtons(); // 자판기 버튼 비활성화
                 showAdminFrame(); // 관리자 프레임 표시
             } else {
                 JOptionPane.showMessageDialog(mainFrame, "비밀번호가 틀렸습니다.");
@@ -321,10 +346,18 @@ public class GUI {
         }
     }
 
+    // showAdminFrame 메소드 수정
     private void showAdminFrame() {
         adminFrame = new JFrame("관리자 모드");
         adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         adminFrame.setSize(800, 600);
+
+        adminFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                enableVendingMachineButtons(); // 자판기 버튼 활성화
+            }
+        });
 
         JPanel adminPanel = new JPanel();
         adminPanel.setLayout(new GridLayout(0, 2));
@@ -362,7 +395,10 @@ public class GUI {
         adminPanel.add(collectCoinsButton);
 
         JButton backButton = new JButton("돌아가기");
-        backButton.addActionListener(e -> adminFrame.dispose());
+        backButton.addActionListener(e -> {
+            adminFrame.dispose();
+            enableVendingMachineButtons();
+        });
         adminPanel.add(backButton);
 
         adminFrame.add(adminPanel, BorderLayout.CENTER);
@@ -399,6 +435,13 @@ public class GUI {
         refillStockFrame.setSize(400, 300);
         refillStockFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        refillStockFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                showAdminFrame(); // 창이 닫힐 때 관리자 모드 창을 다시 염
+            }
+        });
+
         JPanel refillStockPanel = new JPanel();
         refillStockPanel.setLayout(new GridLayout(0, 2));
 
@@ -427,6 +470,13 @@ public class GUI {
         refillCoinsFrame = new JFrame("화폐 보충");
         refillCoinsFrame.setSize(400, 300);
         refillCoinsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        refillCoinsFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                showAdminFrame(); // 창이 닫힐 때 관리자 모드 창을 다시 염
+            }
+        });
 
         JPanel refillCoinsPanel = new JPanel();
         refillCoinsPanel.setLayout(new GridLayout(0, 2));
