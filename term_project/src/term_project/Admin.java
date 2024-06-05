@@ -53,16 +53,27 @@ public class Admin {
         writeMonthlySales(); // 월별 판매 기록을 파일에 저장
     }
 
-    // 일별 판매 기록을 파일에 쓰는 메서드
+    // 일별 판매 기록을 파일에 쓰는 메서드 (기존 데이터를 덮어씀)
     private void writeDailySales() {
         LocalDate currentDate = LocalDate.now(); // 현재 날짜 가져오기
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd"); // 날짜 형식 지정
         String formattedDate = currentDate.format(formatter); // 날짜를 지정된 형식으로 포맷
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/daily.txt", true))) {
-            writer.write(formattedDate + "\n"); // 날짜 기록
-            for (String product : getProductNames()) {
-                writer.write(product + "," + dailySalesMap.getOrDefault(product, 0) + "\n"); // 제품별 판매량 기록
+        // 기존 파일 읽기
+        Map<String, Map<String, Integer>> dailySales = readDailySales();
+
+        // 현재 날짜의 기존 기록 삭제 후 업데이트
+        dailySales.put(formattedDate, new LinkedHashMap<>());
+        for (String product : getProductNames()) {
+            dailySales.get(formattedDate).put(product, dailySalesMap.getOrDefault(product, 0));
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/daily.txt", false))) {
+            for (Map.Entry<String, Map<String, Integer>> entry : dailySales.entrySet()) {
+                writer.write(entry.getKey() + "\n");
+                for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
+                    writer.write(productEntry.getKey() + "," + productEntry.getValue() + "\n");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace(); // 파일 쓰기 중 예외 발생 시 스택 트레이스 출력
@@ -71,20 +82,31 @@ public class Admin {
 
     // 월별 판매 기록을 파일에 쓰는 메서드
     private void writeMonthlySales() {
-        LocalDate currentDate = LocalDate.now(); // 현재 날짜 가져오기
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM"); // 월 형식 지정
-        String formattedDate = currentDate.format(formatter); // 날짜를 지정된 형식으로 포맷
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/month.txt", true))) {
-            writer.write(formattedDate + "\n"); // 월 기록
-            for (String product : getProductNames()) {
-                writer.write(product + "," + monthlySalesMap.getOrDefault(product, 0) + "\n"); // 제품별 판매량 기록
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); // 파일 쓰기 중 예외 발생 시 스택 트레이스 출력
-        }
-    }
-
+	    LocalDate currentDate = LocalDate.now(); // 현재 날짜 가져오기
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M월"); // 월 형식 지정
+	    String formattedDate = currentDate.format(formatter); // 날짜를 지정된 형식으로 포맷
+	
+	    // 기존 파일 읽기
+	    Map<String, Map<String, Integer>> monthlySales = readMonthlySales();
+	
+	    // 현재 월의 기존 기록 삭제 후 업데이트
+	    monthlySales.put(formattedDate, new LinkedHashMap<>());
+	    for (String product : getProductNames()) {
+	        monthlySales.get(formattedDate).put(product, monthlySalesMap.getOrDefault(product, 0));
+	    }
+	
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/month.txt", false))) {
+	        for (Map.Entry<String, Map<String, Integer>> entry : monthlySales.entrySet()) {
+	            writer.write(entry.getKey() + "\n");
+	            for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
+	                writer.write(productEntry.getKey() + "," + productEntry.getValue() + "\n");
+	            }
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace(); // 파일 쓰기 중 예외 발생 시 스택 트레이스 출력
+	    }
+	}
+    
     // 제품 이름 리스트를 반환하는 메서드
     private String[] getProductNames() {
         return new String[]{"물", "커피", "이온음료", "고급커피", "탄산음료", "특화음료"};
@@ -237,7 +259,7 @@ public class Admin {
                 if (line.isEmpty()) {
                     continue; // 빈 줄 건너뛰기
                 }
-                if (line.matches("[a-zA-Z]+")) { // 월 형식인지 확인
+                if (line.matches("[\\d]{1,2}월")) { // 월 형식인지 확인
                     currentMonth = line; // 현재 월 업데이트
                     monthlySales.put(currentMonth, new LinkedHashMap<>()); // 새로운 월의 판매 기록 추가
                 } else if (currentMonth != null) {
