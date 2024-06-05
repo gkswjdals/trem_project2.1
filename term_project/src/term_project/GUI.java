@@ -23,6 +23,8 @@ public class GUI {
     private JLabel[] stockLabels;
     private JLabel[] blueDots;
     private JButton[] drinkButtons;
+    private JLabel[] nameLabels;
+    private JLabel[] priceLabels;
     private JButton insertCoinButton;
     private JButton returnButton;
 
@@ -44,6 +46,8 @@ public class GUI {
         greenDots = new JLabel[drinks.length];
         blueDots = new JLabel[drinks.length];
         drinkButtons = new JButton[drinks.length];
+        nameLabels = new JLabel[drinks.length];
+        priceLabels = new JLabel[drinks.length];
         createAndShowGUI();
     }
 
@@ -92,6 +96,7 @@ public class GUI {
             nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
             nameLabel.setVerticalAlignment(SwingConstants.CENTER);
             pane.add(nameLabel, JLayeredPane.PALETTE_LAYER);
+            nameLabels[dotIndex] = nameLabel;
 
             JLabel priceLabel = new JLabel(drink.getPrice() + "");
             priceLabel.setBounds(labelX + 2, labelY + 16, labelWidth, labelHeight);
@@ -100,6 +105,7 @@ public class GUI {
             priceLabel.setVerticalAlignment(SwingConstants.CENTER);
             priceLabel.setForeground(Color.WHITE);
             pane.add(priceLabel, JLayeredPane.PALETTE_LAYER);
+            priceLabels[dotIndex] = priceLabel;
 
             JButton button = createDrinkButton(drink, buttonX, buttonY, buttonWidth, buttonHeight, dotIndex);
             pane.add(button, JLayeredPane.PALETTE_LAYER);
@@ -398,6 +404,7 @@ public class GUI {
         backButton.addActionListener(e -> {
             adminFrame.dispose();
             enableVendingMachineButtons();
+            updateProductLabels();
         });
         adminPanel.add(backButton);
 
@@ -542,12 +549,11 @@ public class GUI {
         for (int i = 0; i < drinks.length; i++) {
             Product product = vendingMachine.getProducts().get(i);
             drinks[i] = new Drink(product); // Product 객체를 Drink 객체로 변환
+
+            // 제품 이름 및 가격 라벨 업데이트
+            nameLabels[i].setText(drinks[i].getKoreanName());
+            priceLabels[i].setText(drinks[i].getPrice() + "");
         }
-        // 제품 정보 업데이트 후 관리자 모드 화면 새로고침
-        if (adminFrame != null) {
-            adminFrame.dispose();
-        }
-        showAdminFrame();
     }
 
     private void updateBlueDots() {
