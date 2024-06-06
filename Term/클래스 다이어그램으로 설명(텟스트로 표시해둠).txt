@@ -1,0 +1,139 @@
++------------------+
+|      Admin       |
++------------------+
+| - password       |
+| - dailySales     |
+| - monthlySales   |
++------------------+
+| + verifyPassword |
+| + changePassword |
+| + checkPassword  |
+| + recordSale     |
+| + writeDailySales|
+| + writeMonthlySales|
+| + getDailySalesData|
+| + getMonthlySalesData|
+| + getMonthlySalesAmountData|
+| + readDailySales |
+| + readMonthlySales|
+| + refillStock    |
+| + checkCoinStatus|
+| + collectCoins   |
+| + refillCoins    |
+| + changeProductDetails|
++------------------+
+
++------------------+
+|      Drink       |
++------------------+
+| - name           |
+| - koreanName     |
+| - price          |
+| - stock          |
++------------------+
+| + getName        |
+| + getKoreanName  |
+| + getPrice       |
+| + getStock       |
+| + reduceStock    |
+| + refillStock    |
+| + isOutOfStock   |
+| + setName        |
+| + setPrice       |
++------------------+
+
++------------------+
+|     Product      |
++------------------+
+| - name           |
+| - price          |
+| - stock          |
++------------------+
+| + getName        |
+| + getPrice       |
+| + getStock       |
+| + reduceStock    |
+| + isOutOfStock   |
+| + refillStock    |
+| + setName        |
+| + setPrice       |
++------------------+
+
++------------------+
+|      Coin        |
++------------------+
+| - denomination   |
+| - count          |
++------------------+
+| + getDenomination|
+| + getCount       |
+| + addCount       |
+| + reduceCount    |
++------------------+
+
++------------------+
+|  VendingMachine  |
++------------------+
+| - drinks         |
+| - coins          |
+| - dailySales     |
++------------------+
+| + VendingMachine |
+| + insertCoin     |
+| + returnCoins    |
+| + refillCoins    |
+| + printCoinStatus|
+| + collectCoins   |
+| + selectProduct  |
+| + refillStock    |
+| + recordSale     |
+| + getDailySales  |
+| + getCurrentAmount|
+| + initializeCoins|
+| + initializeProducts|
++------------------+
+
++------------------+
+|       UI         |
++------------------+
+| + addBackground  |
+| + addAdminArea   |
++------------------+
+
++------------------+
+|       GUI        |
++------------------+
+| + createAndShowGUI|
+| + addDrink       |
+| + createDrinkButton|
+| + addRedCircleButton|
+| + addReturnButton|
+| + addMoneyButton |
+| + handleDrinkSelection|
+| + returnCoins    |
+| + openNewWindow  |
+| + disableVendingMachineButtons|
+| + enableVendingMachineButtons|
+| + switchToAdminMode|
+| + showAdminFrame |
+| + showSalesData  |
+| + showStockStatus|
+| + showRefillStockFrame|
+| + showRefillCoinsFrame|
+| + showChangeProductDetailsFrame|
+| + changeProductDetails|
+| + updateProductLabels|
+| + updateBlueDots |
++------------------+
+
++------------------+
+|   SalesRecord    |
++------------------+
+| - dailySalesMap  |
+| - monthlySalesMap|
++------------------+
+| + SalesRecord    |
+| + recordSale     |
+| + getDailySales  |
+| + getMonthlySales|
++------------------+
