@@ -359,11 +359,15 @@ public class GUI {
         returnButton.setEnabled(true); // 반환 버튼 활성화
     }
 
-    // 관리자 모드로 전환하는 메서드
     public void switchToAdminMode() {
         JPasswordField passwordField = new JPasswordField(); // 비밀번호 입력 필드 생성
+        JLabel instructionLabel = new JLabel("특수문자, 숫자가 각각 하나 이상 포함된8자리 이상의 영문으로 입력하세요."); // 설명 문구 라벨 생성
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(instructionLabel, BorderLayout.NORTH);
+        panel.add(passwordField, BorderLayout.CENTER);
+
         int option = JOptionPane.showConfirmDialog(
-                mainFrame, passwordField, "비밀번호를 입력하세요:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE); // 비밀번호 입력 대화상자 표시
+                mainFrame, panel, "비밀번호를 입력하세요", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE); // 비밀번호 입력 대화상자 표시
 
         if (option == JOptionPane.OK_OPTION) { // 확인 버튼을 누른 경우
             String inputPassword = new String(passwordField.getPassword()); // 입력된 비밀번호 가져오기
@@ -378,67 +382,97 @@ public class GUI {
 
     // 관리자 모드 프레임을 표시하는 메서드
     private void showAdminFrame() {
-        adminFrame = new JFrame("관리자 모드"); // 관리자 프레임 생성
-        adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 닫기 버튼 동작 설정
-        adminFrame.setSize(800, 600); // 프레임 크기 설정
+    adminFrame = new JFrame("관리자 모드"); // 관리자 프레임 생성
+    adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 닫기 버튼 동작 설정
+    adminFrame.setSize(800, 600); // 프레임 크기 설정
 
-        adminFrame.addWindowListener(new java.awt.event.WindowAdapter() { // 프레임 창 닫기 이벤트 리스너 추가
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                enableVendingMachineButtons(); // 자판기 버튼 활성화
-            }
-        });
-
-        JPanel adminPanel = new JPanel(); // 관리자 패널 생성
-        adminPanel.setLayout(new GridLayout(0, 2)); // 그리드 레이아웃 설정
-
-        JButton dailySalesButton = new JButton("일별 매출 수량 출력"); // 일별 매출 버튼 생성
-        dailySalesButton.addActionListener(e -> showSalesData("일별 매출", admin.getDailySalesData())); // 액션 리스너 추가
-        adminPanel.add(dailySalesButton); // 관리자 패널에 추가
-
-        JButton monthlySalesButton = new JButton("월별 매출 수량 출력"); // 월별 매출 버튼 생성
-        monthlySalesButton.addActionListener(e -> showSalesData("월별 매출", admin.getMonthlySalesData())); // 액션 리스너 추가
-        adminPanel.add(monthlySalesButton); // 관리자 패널에 추가
-
-        JButton monthlySalesAmountButton = new JButton("월별 매출 금액 출력"); // 월별 매출 금액 버튼 생성
-        monthlySalesAmountButton.addActionListener(e -> showSalesData("월별 금액", admin.getMonthlySalesAmountData())); // 액션 리스너 추가
-        adminPanel.add(monthlySalesAmountButton); // 관리자 패널에 추가
-
-        JButton checkStockButton = new JButton("재고 현황"); // 재고 현황 버튼 생성
-        checkStockButton.addActionListener(e -> showStockStatus()); // 액션 리스너 추가
-        adminPanel.add(checkStockButton); // 관리자 패널에 추가
-
-        JButton refillStockButton = new JButton("재고 보충"); // 재고 보충 버튼 생성
-        refillStockButton.addActionListener(e -> showRefillStockFrame()); // 액션 리스너 추가
-        adminPanel.add(refillStockButton); // 관리자 패널에 추가
-
-        JButton coinStatusButton = new JButton("화폐 현황"); // 화폐 현황 버튼 생성
-        coinStatusButton.addActionListener(e -> admin.checkCoinStatus(vendingMachine)); // 액션 리스너 추가
-        adminPanel.add(coinStatusButton); // 관리자 패널에 추가
-
-        JButton refillCoinsButton = new JButton("화폐 보충"); // 화폐 보충 버튼 생성
-        refillCoinsButton.addActionListener(e -> showRefillCoinsFrame()); // 액션 리스너 추가
-        adminPanel.add(refillCoinsButton); // 관리자 패널에 추가
-
-        JButton changeProductDetailsButton = new JButton("제품 정보 변경"); // 제품 정보 변경 버튼 생성
-        changeProductDetailsButton.addActionListener(e -> showChangeProductDetailsFrame()); // 액션 리스너 추가
-        adminPanel.add(changeProductDetailsButton); // 관리자 패널에 추가
-
-        JButton collectCoinsButton = new JButton("수금"); // 수금 버튼 생성
-        collectCoinsButton.addActionListener(e -> admin.collectCoins(vendingMachine)); // 액션 리스너 추가
-        adminPanel.add(collectCoinsButton); // 관리자 패널에 추가
-
-        JButton backButton = new JButton("돌아가기"); // 돌아가기 버튼 생성
-        backButton.addActionListener(e -> {
-            adminFrame.dispose(); // 관리자 프레임 닫기
+    adminFrame.addWindowListener(new java.awt.event.WindowAdapter() { // 프레임 창 닫기 이벤트 리스너 추가
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
             enableVendingMachineButtons(); // 자판기 버튼 활성화
-            updateProductLabels(); // 제품 라벨 업데이트
-        });
-        adminPanel.add(backButton); // 관리자 패널에 추가
+        }
+    });
 
-        adminFrame.add(adminPanel, BorderLayout.CENTER); // 관리자 패널을 관리자 프레임에 추가
-        adminFrame.setVisible(true); // 관리자 프레임 표시
-    }
+    JPanel adminPanel = new JPanel(); // 관리자 패널 생성
+    adminPanel.setLayout(new GridLayout(0, 2)); // 그리드 레이아웃 설정
+
+    // 매출 출력 버튼 생성
+    JButton showSalesButton = new JButton("매출 출력");
+    showSalesButton.addActionListener(e -> showSalesFrame()); // 클릭 시 새로운 창 열기
+    adminPanel.add(showSalesButton); // 관리자 패널에 추가
+
+    JButton checkStockButton = new JButton("재고 현황"); // 재고 현황 버튼 생성
+    checkStockButton.addActionListener(e -> showStockStatus()); // 액션 리스너 추가
+    adminPanel.add(checkStockButton); // 관리자 패널에 추가
+
+    JButton refillStockButton = new JButton("재고 보충"); // 재고 보충 버튼 생성
+    refillStockButton.addActionListener(e -> showRefillStockFrame()); // 액션 리스너 추가
+    adminPanel.add(refillStockButton); // 관리자 패널에 추가
+
+    JButton coinStatusButton = new JButton("화폐 현황"); // 화폐 현황 버튼 생성
+    coinStatusButton.addActionListener(e -> admin.checkCoinStatus(vendingMachine)); // 액션 리스너 추가
+    adminPanel.add(coinStatusButton); // 관리자 패널에 추가
+
+    JButton refillCoinsButton = new JButton("화폐 보충"); // 화폐 보충 버튼 생성
+    refillCoinsButton.addActionListener(e -> showRefillCoinsFrame()); // 액션 리스너 추가
+    adminPanel.add(refillCoinsButton); // 관리자 패널에 추가
+
+    JButton changeProductDetailsButton = new JButton("제품 정보 변경"); // 제품 정보 변경 버튼 생성
+    changeProductDetailsButton.addActionListener(e -> showChangeProductDetailsFrame()); // 액션 리스너 추가
+    adminPanel.add(changeProductDetailsButton); // 관리자 패널에 추가
+
+    JButton collectCoinsButton = new JButton("수금"); // 수금 버튼 생성
+    collectCoinsButton.addActionListener(e -> admin.collectCoins(vendingMachine)); // 액션 리스너 추가
+    adminPanel.add(collectCoinsButton); // 관리자 패널에 추가
+
+    JButton backButton = new JButton("돌아가기"); // 돌아가기 버튼 생성
+    backButton.addActionListener(e -> {
+        adminFrame.dispose(); // 관리자 프레임 닫기
+        enableVendingMachineButtons(); // 자판기 버튼 활성화
+        updateProductLabels(); // 제품 라벨 업데이트
+    });
+    adminPanel.add(backButton); // 관리자 패널에 추가
+
+    adminFrame.add(adminPanel, BorderLayout.CENTER); // 관리자 패널을 관리자 프레임에 추가
+    adminFrame.setVisible(true); // 관리자 프레임 표시
+}
+
+    // 매출 관련 버튼들이 있는 새로운 창을 여는 메서드
+	private void showSalesFrame() {
+    JFrame salesFrame = new JFrame("매출 출력");
+    salesFrame.setSize(400, 400);
+    salesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    JPanel salesPanel = new JPanel();
+    salesPanel.setLayout(new GridLayout(3, 2));
+
+    JButton dailySalesButton = new JButton("일별 매출 수량 출력"); // 일별 매출 버튼 생성
+    dailySalesButton.addActionListener(e -> showSalesData("일별 매출", admin.getDailySalesData())); // 액션 리스너 추가
+    salesPanel.add(dailySalesButton); // 매출 패널에 추가
+
+    JButton monthlySalesButton = new JButton("월별 매출 수량 출력"); // 월별 매출 버튼 생성
+    monthlySalesButton.addActionListener(e -> showSalesData("월별 매출", admin.getMonthlySalesData())); // 액션 리스너 추가
+    salesPanel.add(monthlySalesButton); // 매출 패널에 추가
+
+    JButton dailySalesAmountButton = new JButton("일별 매출 금액 출력"); // 일별 매출 금액 버튼 생성
+    dailySalesAmountButton.addActionListener(e -> showSalesData("일별 금액", admin.getDailySalesAmountData())); // 액션 리스너 추가
+    salesPanel.add(dailySalesAmountButton); // 매출 패널에 추가
+
+    JButton monthlySalesAmountButton = new JButton("월별 매출 금액 출력"); // 월별 매출 금액 버튼 생성
+    monthlySalesAmountButton.addActionListener(e -> showSalesData("월별 금액", admin.getMonthlySalesAmountData())); // 액션 리스너 추가
+    salesPanel.add(monthlySalesAmountButton); // 매출 패널에 추가
+
+    JButton totalSalesButton = new JButton("총 매출 수량"); // 총 매출 수량 버튼 생성
+    totalSalesButton.addActionListener(e -> showSalesData("총 매출 수량", admin.getTotalSalesData())); // 액션 리스너 추가
+    salesPanel.add(totalSalesButton); // 매출 패널에 추가
+
+    JButton totalSalesAmountButton = new JButton("총 매출 금액"); // 총 매출 금액버튼 생성
+    totalSalesAmountButton.addActionListener(e -> showSalesData("총 매출 금액", admin.getTotalSalesAmountData())); // 액션 리스너 추가
+    salesPanel.add(totalSalesAmountButton); // 매출 패널에 추가
+
+    salesFrame.add(salesPanel);
+    salesFrame.setVisible(true);
+}
+
 
     // 총 매출을 표시하는 메서드
     private void showTotalSales(String title, int totalSales) {

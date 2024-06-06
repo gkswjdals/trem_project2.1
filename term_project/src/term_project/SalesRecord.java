@@ -24,6 +24,7 @@ public class SalesRecord {
         String month = today.getMonth().toString(); // 현재 월을 문자열로 가져옴
         monthlySales.put(month, monthlySales.getOrDefault(month, 0) + quantity); // 월별 매출 기록을 업데이트
     }
+    
 
     // 일별 매출 기록을 반환하는 메서드
     public Map<LocalDate, Map<String, Integer>> getDailySales() {
