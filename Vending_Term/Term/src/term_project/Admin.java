@@ -44,7 +44,7 @@ public class Admin {
         }
     }
 
-    // 판매 기록을 저장하고 일별, 월별 판매 맵을 갱신하는 메서드
+ // 판매 기록을 저장하고 일별, 월별 판매 맵을 갱신하는 메서드
     public void recordSale(String productName, int quantity) {
         // 파일에서 기존 일별 및 월별 판매 기록을 읽어옴
         Map<String, Map<String, Integer>> dailySales = readDailySales();
@@ -71,8 +71,8 @@ public class Admin {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/daily.txt", false))) {
             for (Map.Entry<String, Map<String, Integer>> entry : dailySales.entrySet()) {
                 writer.write(entry.getKey() + "\n");
-                for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
-                    writer.write(productEntry.getKey() + "," + productEntry.getValue() + "\n");
+                for (String product : getProductNames()) {
+                    writer.write(product + "," + entry.getValue().getOrDefault(product, 0) + "\n");
                 }
             }
         } catch (IOException e) {
@@ -83,14 +83,15 @@ public class Admin {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/month.txt", false))) {
             for (Map.Entry<String, Map<String, Integer>> entry : monthlySales.entrySet()) {
                 writer.write(entry.getKey() + "\n");
-                for (Map.Entry<String, Integer> productEntry : entry.getValue().entrySet()) {
-                    writer.write(productEntry.getKey() + "," + productEntry.getValue() + "\n");
+                for (String product : getProductNames()) {
+                    writer.write(product + "," + entry.getValue().getOrDefault(product, 0) + "\n");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
 
     // 일별 판매 기록을 파일에 쓰는 메서드 (기존 데이터를 누적)
